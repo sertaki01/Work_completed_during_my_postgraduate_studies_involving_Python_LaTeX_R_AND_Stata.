@@ -1,1 +1,0 @@
-If you would like to read the summary of my master's thesis, please refer to the following file: master's thesis/Διπλωματική Εργασία (ΠΜΣ)/Αξιολόγηση_μεθόδων_ενίσχυσης_κλίσης__για_την_εκτίμηση_κατανάλωσης_ενέργειας_σε_κρυπτονομίσματα.pdf.

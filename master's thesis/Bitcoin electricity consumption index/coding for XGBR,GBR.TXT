@@ -1,0 +1,98 @@
+########## Extreme Gradient Boosting.
+from xgboost import XGBRegressor
+from sklearn.pipeline import Pipeline
+from skopt import BayesSearchCV
+from skopt.space import Real, Integer
+
+estimators = [("xgbr", XGBRegressor(random_state = 0, device = "cuda"))] # [] A sequence of items.
+
+pipe = Pipeline(steps = estimators) # We use a pipeline to automate the process of hyperparameter tuning.
+
+gbr_search = {  # A set to store a collection of unique elements.
+               'xgbr__learning_rate': Real(0.0,1.0), # Determines the step size in the parameter adjustments, which will lead to the minimization of the cost function.
+               'xgbr__max_depth': Integer(1, 10), # Controls the complexity of the model.
+               'xgbr__subsample': Real(0.0, 1.0), # For each base learner, a random subset of the sample is chosen on which it will be trained.
+               'xgbr__reg_lambda': Real(0.0, 10.0), # A regularization term that penalizes the model as it becomes more complex.
+               'xgbr__reg_alpha': Real(0.0, 10.0), # A regularization term that penalizes the model as it becomes more complex.
+               'xgbr__colsample_bytree': Real(0.5, 1.0), # It uses a percentage of the features at random to construct each tree.
+               'xgbr__colsample_bylevel': Real(0.5, 1.0), # Randomly selects independent variables for each node in a tree.
+               'xgbr__colsample_bynode': Real(0.5, 1.0), # Randomly selects independent variables for each split in a tree.
+               'xgbr__n_estimators': Integer(1000, 3000), # Number of gradient boosted trees where each one tries to correct the errors of the previous one.
+}
+
+start_time = datetime.now() # Timing starts.
+
+opt = BayesSearchCV(pipe, gbr_search, n_iter = 70, cv = 10, verbose = 3, random_state = 0) # We use it to optimize the hyperparameters of the machine learning model.
+
+opt.fit(X_train, y_train) # Using the hyperparameters from the BayesSearch, we will train our model using the training set.  
+
+end_time = datetime.now() 
+
+print('Duration: {}'.format(end_time - start_time)) # Runtime of the machine learning model.
+
+y_pred_train = opt.predict(X_train) # Predict the y values for the data that was used to estimate the parameters. 
+
+print(y_pred_train)
+print(y_train) # Check.
+
+y_pred_test = opt.predict(X_test) # Forecasting the variable y in a new, unseen dataset.
+
+print(y_pred_test)
+print(y_test) # Check.
+
+train_score = NSE(y_train, y_pred_train) 
+test_score = NSE(y_test, y_pred_test)
+tr_score = mean_absolute_percentage_error(y_train, y_pred_train)
+te_score = mean_absolute_percentage_error(y_test, y_pred_test)
+
+print("Train NSE score: %0.2f" % train_score) # Model performance on the training set(training error).
+print("Test NSE score: %0.2f" % test_score) # Model performance on the test set(generalization error).
+print("Train mean_absolute_percentage_error score : %0.2f" % tr_score ) # Model performance using MAPE.
+print("Test mean_absolute_percentage_error score : %0.2f" % te_score ) # Model performance using MAPE.
+print("Best params: %s" % str(opt.best_params_)) # Optimal hyperparameters for the model.
+
+
+
+
+######### Simple Gradient Boosting.
+
+########## GRADIENT BOOSTING REGRESSOR.
+
+gbr = GradientBoostingRegressor(random_state = 0) # GBR.
+
+search_space = { "n_estimators" : [100, 150, 200, 225, 250, 275], "learning_rate" : [0.06, 0.07, 0.08 , 0.09 , 0.1, 0.11, 0.12], "max_depth" : [1,2,3,4,5],
+                 "n_iter_no_change" : [2, 4, 5, 8, 10, 12], } # It is the space in which GridSearchCV will search to find the optimal combination of hyperparameters for our model.
+                                                                      # A combination that minimizes the chosen evaluation metric. 
+start_time = datetime.now() # Timing starts.
+
+GS = GridSearchCV(estimator = gbr, param_grid = search_space, scoring = score, cv = 6, verbose = 3 ) # The application of GridSearchCV, which will search to find the best hyperparameters according
+                                                                                                     # to the space we have given it to search and the functions to minimize. 
+GS.fit(X_train, y_train) # Use the train set to fit the parameters.
+
+end_time = datetime.now() # The timer stops.
+
+print('Duration: {}'.format(end_time - start_time)) # Runtime of the machine learning model.
+
+########## PREDICTION OF THE VARIABLE Y FOR TRAIN AND TEST SET. 
+
+y_pred_train = GS.predict(X_train) # Predict the y values for the data that was used to estimate the parameters. 
+
+print(y_pred_train) # Check.
+print(y_train) # Check.
+
+y_pred_test = GS.predict(X_test) # Forecasting - predict the variable y in a new, unseen dataset.
+
+print(y_pred_test) # Check.
+print(y_test) # Check.
+
+########## EVALUATION OF THE MODEL.
+
+train_score = NSE(y_train, y_pred_train) # NSE evaluation metric for training set.
+test_score = NSE(y_test, y_pred_test) # NSE evaluation metric for test set.
+tr_score = mean_absolute_percentage_error(y_train, y_pred_train) # MAPE evaluation metric for training set.
+te_score = mean_absolute_percentage_error(y_test, y_pred_test) # MAPE evaluation metric for test set.
+
+print("Train NSE score: %0.2f" % train_score) # Model performance on the training set(training error).
+print("Test NSE score: %0.2f" % test_score) # Model performance on the test set(generalization error).
+print("Train mean_absolute_percentage_error score : %0.2f" % tr_score ) # Model performance using MAPE.
+print("Test mean_absolute_percentage_error score : %0.2f" % te_score ) # Model performance using MAPE.

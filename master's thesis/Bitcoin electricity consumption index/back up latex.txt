@@ -1,0 +1,559 @@
+\documentclass{article}
+\usepackage{amsmath, amsthm, amssymb, amsfonts}
+\usepackage{thmtools}
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{geometry}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[english,greek]{babel}
+\usepackage{framed}
+\usepackage{hyperref}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tcolorbox}
+\usepackage{csvsimple}
+\usepackage{booktabs}
+\usepackage{import}
+\usepackage{pdflscape}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usepackage{pgf-pie}
+\usepackage{listings}
+\usepackage{titlesec}
+\usepackage[T1]{fontenc}
+\usepackage{enumitem}
+\usepackage{adjustbox}
+\usepackage{titlesec}
+\usepackage{longtable}
+\usepackage[LGR]{fontenc}
+\usepackage[greek]{babel}
+\usepackage{color}
+\usepackage{caption}
+\definecolor{UniBlue}{RGB}{83,121,170}
+\newcommand{\HRule}{\rule{\linewidth}{0.08mm}} % horizontal lines
+\titleformat{\section}{\normalfont\LARGE\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\bfseries}{\thesubsection}{1em}{}
+\titleformat{\section}[block]{\normalfont\Large\bfseries\filcenter}{\thesection\hspace{1em}}{0em}{}
+
+\colorlet{LightGray}{White!90!Periwinkle}
+\colorlet{LightOrange}{Orange!15}
+\colorlet{LightGreen}{Green!15}
+
+
+
+\declaretheoremstyle[name=Theorem,]{thmsty}
+\declaretheorem[style=thmsty,numberwithin=section]{theorem}
+\tcolorboxenvironment{theorem}{colback=LightGray}
+
+\declaretheoremstyle[name=Proposition,]{prosty}
+\declaretheorem[style=prosty,numberlike=theorem]{proposition}
+\tcolorboxenvironment{proposition}{colback=LightOrange}
+
+\declaretheoremstyle[name=Principle,]{prcpsty}
+\declaretheorem[style=prcpsty,numberlike=theorem]{principle}
+\tcolorboxenvironment{principle}{colback=LightGreen}
+\setstretch{1.2}
+\geometry{
+    textheight=9in,
+    textwidth=5.5in,
+    top=1in,
+    headheight=12pt,
+    headsep=25pt,
+    footskip=30pt
+}
+
+
+% ------------------------------------------------------------------------------
+
+\begin{document}
+
+\begin{titlepage}
+	\begin{center}
+
+      
+	   \begin{figure}[htb!]
+		\centering
+		\includegraphics[scale=0.5]{up_2017_logo_gr_grey.jpg}{}
+   	   \end{figure}
+   	   
+	
+	
+\hfill \break
+	   
+		
+		\HRule \\[0.1cm]
+        {\Large Αξιολόγηση μεθόδων ενίσχυσης κλίσης  για την εκτίμηση κατανάλωσης ενέργειας σε κρυπτονομίσματα} % Title of your document
+       \HRule \\[0.1cm]
+			
+		
+
+	\hfill \break
+     \hfill \break
+        \bigskip
+    \Large{\fontfamily{qtm}\textbf{ Δημήτριος Σέρβος }}
+	
+	\hfill \break
+	\hfill \break
+    \bigskip
+	 
+	
+	
+	
+	{\normalsize «Εφαρμοσμένη Οικονομική και Ανάλυση Δεδομένων» \\
+	Τμήμα Οικονομικών Επιστημών \\ 
+	Σχολή Οικονομικών Επιστημών και Διοίκησης Επιχειρήσεων } 
+
+
+\hfill \break
+\hfill \break
+\bigskip 
+
+{\normalsize Διατριβή που υπεβλήθη για την ικανοποίηση μέρους των
+απαιτήσεων για την απόκτηση Μεταπτυχιακού Διπλώματος Ειδίκευσης}
+
+
+\hfill \break
+\hfill \break
+\bigskip	
+	
+
+
+\normalsize{09/2024}\\
+
+
+\end{center}
+
+\end{titlepage}
+
+\newpage
+
+\pagenumbering{roman}
+
+\large Πανεπιστήμιο Πατρών, Τμήμα Οικονομικών Επιστημών
+
+\vspace{12pt}
+
+Δημήτριος
+
+\vspace{12pt}
+
+{\copyright} $2024$ $-$ Με την επιφύλαξη παντός δικαιώματος
+
+
+\newpage
+
+\begin{center}
+	\textbf{Τριμελής Επιτροπή Επίβλεψης διπλωματικής εργασίας}
+\end{center}
+\bigskip \bigskip
+\begin{table}[h!]
+    \centering
+\begin{tabular}{ l l l }
+	\large\textbf{Επιβλέπων/πουσα}: & \largeΕμμανουήλ  Τζαγκαράκης & \largeΑναπληρωτής Καθηγητής\\\\
+	\large\textbf{Μέλος Επιτροπής:}  & \largeΚωνσταντίνος Κουνετάς & \largeΑναπληρωτής Καθηγητής\\\\
+	\large\textbf{Μέλος Επιτροπής:}  & \largeΓεώργιος Φίλης & \largeΕπίκουρος Καθηγητής
+\end{tabular}
+\end{table}
+
+\bigskip \bigskip \bigskip \bigskip \bigskip
+
+Η παρούσα διατριβή με τίτλο
+
+\bigskip
+
+\begin{center}
+\textit{\guillemotleft\fontfamily{qcr}\selectfont Αξιολόγηση μεθόδων ενίσχυσης κλίσης  για την εκτίμηση κατανάλωσης ενέργειας σε κρυπτονομίσματα \guillemotright}
+\end{center}
+
+\bigskip
+
+Εκπονήθηκε από τον/την \textbf{Δημήτριος Σέρβος, Α.Μ 1067563}, για τη μερική ικανοποίηση των απαιτήσεων για την απόκτηση Μεταπτυχιακού Διπλώματος Ειδίκευσης στην \textit{\guillemotleft\fontfamily{qcr}\selectfont Εφαρμοσμένη Οικονομική και Ανάλυση Δεδομένων\guillemotright} από το Πανεπιστήμιο Πατρών και εγκρίθηκε από τα μέλη της τριμελούς επιβλέπουσας επιτροπής.
+
+
+\newpage
+
+Θα ήθελα να αφιερώσω τη διπλωματική μου εργασία στους γονεις μου, Θεόδωρο \& Γεωργία, στην κοπέλα μου, Νάσια, και σε όλους όσους με βοήθησαν.
+
+\newpage
+
+
+\tableofcontents
+
+\newpage
+\pagenumbering{arabic}
+% --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+\section{ΕΙΣΑΓΩΓΗ}
+
+\paragraph{} Η συνεχής προόδος της τεχνολογίας έχει δώσει τη δυνατότητα σε πολλά μοντέλα μηχανικής μάθησης να μπορούν να πραγματοποιηθούν σε ενα αποδεκτό χρονικό διάστημα, με αποτέλεσμα να αυξάνεται η χρηστικότητα τους. Σε συνδυασμό με τις επιδόσεις που συνοδεύουν αυτή τη χρηστικότητα, έχουν αποτελέσει πόλο έλξης τα τελευταία χρόνια για ένα μεγάλο σύνολο επιστημονικών πεδίων, ένα από τα οποία είναι και τα οικονομικά. Μια από τις πιο δημοφιλείς και ταυτόχρονα επιτυχημένες τεχνικές μηχανικής μάθησης είναι η \foreignlanguage{english}{Gradient boosting}. Το μοντέλο \foreignlanguage{english}{Gradient boosting} προτάθηκε απο τον  \foreignlanguage{english}{Friedman} (2001). Ο τρόπος λειτουργίας του μοντέλου παράγει μια διαδικασία η οποία είναι ερμηνεύσιμη και πολύ ανθεκτική, τόσο για παλινδρόμηση όσο και για ταξινόμηση. Επίσης, για να μπορέσει να πραγματοποιηθεί το \foreignlanguage{english}{boosting}, το μοντέλο χρησιμοποιεί δέντρα για αδύναμους μαθητές. Η έννοια των αδύναμων μαθητών, ή αλλιώς \foreignlanguage{english}{weak learners}, προήλθε από τον \foreignlanguage{english}{Schapire} (1990). Ο οποίος απέδειξε ότι ένα μοντέλο μάθησης το οποίο ο μαθητής  αποδίδει λίγο καλύτερα από μια τυχαία εικασία ειναι ισοδύναμο με ένα μοντέλο μάθησης στο οποίο το σφάλμα του μαθητή είναι πολύ μικρό. Επομένως, από έναν αλγόριθμο αδύναμης μάθησης μπορείς να τον μετατρέψεις σε έναν αλγόριθμο που επιτυγχάνει ηψηλή ακρίβεια. Έχοντας έτσι πρακτικές εφαρμογές, μετατρέποντας αποτελεσματικά έναν μέτριο αλγόριθμο μάθησης σε έναν αλγόριθμο που επιτυγχάνει εξαιρετικά καλή απόδοση. \par
+Τα τελευταία χρόνια, η ερευνητική δραστηριότητα για ένα από τα πιο γνωστά και σημαντικά κρυπτονομίσματα, το \foreignlanguage{english}{Bitcoin}, έχει αυξηθεί παράλληλα με την αύξηση και την προσβασιμότητα των δεδομένων. Αυτή η αύξηση ενδιαφέροντος οφείλεται σε λόγους όπως η κατανάλωση ενέργειας για την παραγωγή του  \foreignlanguage{english}{Bitcoin} και οι πιθανές συνέπειες που ενέχει, ενώ η αποκεντρωμένη φύση του αποτελεί επίσης έναν πόλο έλξης. Ο \foreignlanguage{english}{Nakamoto} (2008) είναι το άτομο πίσω από τη δημιουργία του γνωστού σε όλους  \foreignlanguage{english}{Bitcoin}. Στηρίζεται σε ένα σύστημα ηλεκτρονικών πληρωμών που δεν χρειάζεται κάποιον διαμεσολαβητή, και άρα δεν βασίζεται στην εμπιστοσύνη. Επίσης, το σύστημα αυτό παρέχει πολύ καλή ασφάλεια λόγω του \foreignlanguage{english}{proof of work}, το οποίο καθιστά υπολογιστικά ανέφικτη την ηλεκτρονική επίθεση. Το \foreignlanguage{english}{proof of work} χρησιμοποιείται για την καταγραφή των συναλλαγών, για την οποία δίνεται μια ανταμοιβή βάσει της καλύτερης προσπάθειας. \par
+ 
+
+%---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+\newpage
+\section{ΒΙΒΛΙΟΓΡΑΦΙΚΗ ΑΝΑΣΚΟΠΗΣΗ } 
+
+\subsection{ Το \foreignlanguage{english}{Bitcoin} και η κατανάλωση ενέργειας}
+
+\paragraph{} Το \foreignlanguage{english}{Bitcoin} έχει φέρει επανάσταση σχετικά με τους ενδεδειγμένους τρόπους για την πραγματοποίηση μιας χρηματοοικονομικής συνναλαγής. Τα τελευταία χρόνια έχουν αρχίσει να προκύπτουν αμφιβολίες ανάμεσα στην επιστημονική κοινότητα  σχετικά με αυτήν την νέα τεχνολογία και το αν τα θετικά που προσφέρει μπορούν να καλύψουν τα εν δυνάμει αρνητικά της.  Ο \foreignlanguage{english}{Vranken} (2017), εστιάζοντας στη λειτουργία μέσω της οποίας γίνεται η εξόρυξη \foreignlanguage{english}{Bitcoin} και εξετάζοντας την εξέλιξη στον υπολογιστικό εξοπλισμό που χρησιμοποιείται για αυτήν, κατέληξε ότι για την συγκεκριμένη περίοδο η ενεργειακή κατανάλωση του \foreignlanguage{english}{Bitcoin} είναι $100$\foreignlanguage{english}{MW}. Επίσης, έγινε εξέταση συστημάτων εξόρυξης \foreignlanguage{english}{Bitcoin} που απαιτούν πολύ λιγότερη ενέργεια και θα μπορούσαν να περιορίσουν το πρόβλημα, όπως το \foreignlanguage{english}{proof-of-stake}. Στο \foreignlanguage{english}{proof-of-stake} η δυσκολία εξόρυξης προσδιορίζεται ατομικά για κάθε παίκτη, σε σύγκριση με το \foreignlanguage{english}{proof-of-work}, 'οπου όσο αυξάνεται ο ανταγωνισμός, αυξάνεται και η δυσκολία εξόρυξης και άρα η κατανάλωση ενέργειας. Στην συνέχεια, ο \foreignlanguage{english}{de Vries} (2018) περιγράφει μεθοδολογίες που στοχεύουν στην εκτίμηση της τρέχουσας και μελλοντικής κατανάλωσης ηλεκτρικής ενέργειας του δικτύου \foreignlanguage{english}{Bitcoin}. Σύμφωνα με τις εκτιμήσεις, το \foreignlanguage{english}{Bitcoin} καταναλώνει τουλάχιστον $2.55$\foreignlanguage{english}{GW} ηλεκτρικής ενέργειας, ενώ στο μέλλον θα μπορούσε να φτάσει στα $7.67$\foreignlanguage{english}{GW}, μέγεθος συγκρίσιμο με χώρες όπως η Ιρλανδία($3.1$\foreignlanguage{english}{GW}) και η Αυστρία($8.2$\foreignlanguage{english}{GW}). Επίσης, με βάση τις συναλλαγές ανά ημέρα, καταλήγει στο συμπέρασμα ότι η μέση κατανάλωση ενέργειας ανά συναλλαγή είναι $300$\foreignlanguage{english}{kWh}, με το συγκεκριμένο νούμερο να μπορεί να ξεπεράσει τα $900$\foreignlanguage{english}{kWh} μέχρι το τέλος του 2018. Τονίζοντας έτσι ένα μεγάλο πρόβλημα του \foreignlanguage{english}{Bitcoin} που θα πρέπει να ληφθεί σοβαρά υπόψη.\par
+Την ίδια χρονιά, μια διαφορετική οπτική του ίδιου προβλήματος δόθηκε από τον \foreignlanguage{english}{Truby} (2018). Ο οποίος προτείνει δημοσιονομικές και ρυθμιστικές πολιτικές, με στόχο μια περιβαλλοντικά βιώσιμη ανάπτυξη των εφαρμογών που αφορούν τη λειτουργία του \foreignlanguage{english}{Bitcoin}. Χωρίς αυτό να σημαίνει ότι θα υπάρξει κάποια ζημιά στα πλεονεκτήματα που προσφέρει μια τέτοια τεχνολογία. Μια από τις πολλές πολιτικές που προτάθηκαν είναι μέσω της χρήσης δημοσιονομικών εργαλείων να ενθαρρυνθεί η κατασκευή πιο αποτελεσματικών τεχνολογιών που βοηθούν στην επίτευξη περιβαλλοντικών στόχων. O \foreignlanguage{english}{Dilek} και \foreignlanguage{english}{Furuncu} (2018) μελέτησαν επιπτώσεις από την υψηλή κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin}. Σύμφωνα με τη μελέτη τους, η ενέργεια που απαιτείται για τις  συναλλαγές και την εξόρυξη του \foreignlanguage{english}{Bitcoin} προέρχεται από άνθρακα και υδρογονάνθρακες. Τέτοιες πηγές ενέργειας προκαλούν αύξηση της θερμοκρασίας, της ρύπανσης ακόμα και το ποσοστών θνησιμότητας, με αποτέλεσμα να θέτουν σε κίνδυνο τον πλανήτη. Βλεπουμε εως τωρα συμφωνα με την βιβλιογραφια οτι εννοω το \foreignlanguage{english}{Bitcoin} εχει παρα πολυ θετικα εχει σοβαρα μειωνεκτηματα που πρεπει οποσδηποτε να λειφθουν υποψη. Ο \foreignlanguage{english}{Stoll et al.} (2019) εκτιμούν την κατανάλωση ενέργειας της τεχνολογίας \foreignlanguage{english}{blockchain} του \foreignlanguage{english}{Bitcoin} χρησιμοποιώντας αναφορές από την \foreignlanguage{english}{IPO} για κατασκευαστές εξοπλισμού υπολογιστών για εξόρυξη \foreignlanguage{english}{Bitcoin}, πληροφορίες σχετικές με την κλίμακα εξόρυξης \foreignlanguage{english}{Bitcoin}, και τέλος, πληροφορίες σχετικές με δημόσιες ομάδες εξόρυξης. Μετά τη συλλογή των παραπάνω πληροφοριών, μετέφρασαν τα αποτελέσματα κατανάλωσης ενέργειας από την εκτίμηση τους σε εκμπομπές άνθρακα χρησιμοποιώντας τις διευθύνσης \foreignlanguage{english}{IP}. Με βάση τις παραπάνω πληροφορίες, εκτίμησαν ότι η ετήσια κατανάλωση ηλεκτρικής ενέργειας του \foreignlanguage{english}{Bitcoin} είναι $45.8$\foreignlanguage{english}{TWh} μέχρι τον Νοέμβριο του 2018 και οι ετήσιες εκπομπές άνθρακα κυμαίνονται μεταξύ $22.0$ και $22.9$ \foreignlanguage{english}{$MtCO_2$}. Αυτές οι μετρήσεις είναι συγκρίσιμες με χώρες όπως Ιορδανία, Σρι Λάνκα και το \foreignlanguage{english}{Kansas City}.\par
+Εν συνεχεία, ένα χρόνο μετά, οι \foreignlanguage{english}{Küfeoğlu} και \foreignlanguage{english}{Özkuran} (2019) εκτίμησαν την κατανάλωση ενέργειας που προέρχεται από τη διαδικασία \foreignlanguage{english}{proof-of-work} του \foreignlanguage{english}{Bitcoin}. Χρησιμοποίησαν $160$\foreignlanguage{english}{GB} δεδομένων \foreignlanguage{english}{blockchain}. Στο \foreignlanguage{english}{blockchain} πραγματοποιούνται και αποθηκεύονται όλες οι συναλλαγές. Επιπλέον, έλαβαν υπόψη την απόδοση $269$ μοντέλων υλικού \foreignlanguage{english}{CPU, GPU, FPGA, ASIC} που χρησιμοποιούνται στη διαδικασία εξόρυξης \foreignlanguage{english}{Bitcoin}. Με βάση τα παραπάνω στοιχεία, υπολόγισαν δύο μετρικές: την ελάχιστη και τη μέγιστη κατανάλωση ενέργειας. Η ελάχιστη κατανάλωση προκύπτει από τη χρήση του πιο αποδοτικού μοντέλου από όλους τους συμμετέχοντες στην εξόρυξη \foreignlanguage{english}{Bitcoin}. Η μέγιστη κατανάλωση προκύπτει από τη χρήση της λιγότερης αποδοτικότητας του υλικού που απαιτείται για να υπάρξει κερδοφορία από την εξόρυξη \foreignlanguage{english}{Bitcoin}. Με βάση τα παραπάνω στοιχεία, βρήκαν ότι η μέγιστη κατανάλωση ενέργειας, κατά την εξεταζόμενη περίοδο (2009-2018), καταγράφηκε σε μια περίοδο δύο εβδομάδων, η οποία ξεκίνησε από τις 18 Δεκεμβρίου 2017 και κυμαινόταν μεταξύ $1.3$ και $14.8$\foreignlanguage{english}{GW}. Αυτά τα νουύμερα συγκρίνονται με τις χώρες όπως η Δανία($\sim14$\foreignlanguage{english}{GW}) και η Φινλανδία($\sim16$\foreignlanguage{english}{GW}). Επίσης, παρατήρησαν ότι η ενεργειακή κατανάλωση του \foreignlanguage{english}{Bitcoin} επηρεάζεται από την τιμή του. Με την πτώση της τιμής παρατήρησαν πτώση στη μέγιστη κατανάλωση ενέργειας. Αναφέρουν επίσης τη δυσκολία της εκτίμησης λόγω παραγόντων όπως η μεγάλη μεταβολή της τιμής και η δυσκολία αποτίμησης της αξίας του \foreignlanguage{english}{Bitcoin}, οι οποίοι επηρεάζουν άμεσα την κατανάλωση ενέργειας, καθώς και την αποδοτικότητα του υλικού που χρησιμοποιούν οι συμμετέχοντες στην αγορά \foreignlanguage{english}{Bitcoin}.\par 
+Αυτή η συνεχής αύξηση της δημοτικότητας του \foreignlanguage{english}{Bitcoin}, κάνοντας το το ποιο δημοφιλές και αποδεκτό κρυπτονόμισμα παγκοσμίως, συνέχισε να αυξάνει το ενδιαφέρον στην επιστημονική κοινότητα. Ο \foreignlanguage{english}{Mir} (2020) αναλύει τα θετικά και τα αρνητικά που συνεπάγεται μια τεχνολογία όπως το \foreignlanguage{english}{Bitcoin} και αναφέρει προκλήσεις που σχετίζονται με την κατανάλωση ενέργειας του. Κάποια από τα πολλά θετικά που έχει η τεχνολογία \foreignlanguage{english}{Bitcoin} σε σύγκριση με τις συμβατικές μεθόδους συναλλαγών είναι η γρήγορη επεξεργασία, κάνοντας τις συναλλαγές ταχύτερες, και η μεγάλη ασφάλεια, καθώς οι συναλλαγές δεν αποθηκεύουν τα προσωπικά στοιχεία του αποστολέα ή του παραλήπτη. Προτείνει κάποιες εναλλακτικές λύσεις σε σχέση με τη διαδικασία εξόρυξης του \foreignlanguage{english}{Bitcoin}(\foreignlanguage{english}{proof of work}), όπως το \foreignlanguage{english}{ Proof of Authentication,  Intel’s Proof-of-Elapsed}. Αυτές οι εναλλακτικές προτάσεις είναι πιο αποδοτικοί αλγόριθμη επιβεβαίωσης συναλλαγών σε σύγκριση με τον αλγόριθμο που χρησιμοποιεί το \foreignlanguage{english}{Bitcoin}, όπου ο ισχυρότερος υπολογιστής, και συνεπώς η μεγαλύτερη κατανάλωση ενέργειας, θα επιβεβαιώση τη συναλλαγή και θα πάρει την ανταμοιβή του. Επιπλέον, υπάρχει πρόβλημα με τις πηγές ενέργειας, και μια λύση θα μπορούσε να είναι η αιολική ενέργεια ή η ενέργεια από φράγματα για την παραγωγή ηλεκτρικής ενέργειας. Συνεπώς, αν και τα θετικά ειναι αρκετά για να μην αγνοηθούν οι δυνατότητες της τεχνολογίας,  χρειάζονται ριζικές αλλαγές στον τρόπο με τον οποίο γίνονται η επιβεβαίωση των συναλλαγών και οι πηγές ενέργειας που χρησιμοποιούνται.\par
+Για ακόμα μία φορά, ο \foreignlanguage{english}{de Vries} (2020) ήρθε να συμβάλει στη βιβλιογραφία του \foreignlanguage{english}{Bitcoin} προτείνοντας μια προσέγγιση δυναμικής αγοράς για την εκτίμηση της κατανάλωσης ενέργειας. Είναι σημαντικό να λαμβάνονται υπόψη οι συνθήκες που περιβάλλουν την αγορά, διότι σύμφωνα με αυτές επηρεάζονται οι συμμετέχοντες, και σύμφωνα με τους συμμετέχοντες επηρεάζεται η κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin}. Σε αντίθεση με άλλες εκτιμήσεις της κατανάλωσης ενέργειας του  \foreignlanguage{english}{Bitcoin}, οι οποίες υποθέτουν στατικότητα στην αγορά, παρέχοντας έτσι αισιόδοξα αποτέλεσματα, η παραπάπω προσέγγιση αναγνωριζεί την επίδραση μιας δυναμικής αγοράς. Λόγω της τεράστιας ανάπτυξης και κερδοφορίας του \foreignlanguage{english}{Bitcoin}, δίνεται η δυνατότητα στους συμμετέχοντες στην αγορά να μην επιλέγουν την πιο αποδοτική λύση. Με βάση τα παραπάνω και μια λίστα πωλήσεων \foreignlanguage{english}{Bitcoin}, πραμγατοποιήθηκε μια συντηριτική εκτίμηση της κατανάλωσης ενέργειας του \foreignlanguage{english}{Bitcoin} στα $87.1$\foreignlanguage{english}{TWh} ετησίως έως τις 30 Σεπτεμβρίου 2019, ξεπερνώντας άλλες εκτιμήσεις που είχαν γίνει εκείνο το χρονικό διάστημα($73.1$ εως $78.3$\foreignlanguage{english}{TWh} ετησιως). Αυτός ο αριθμός είναι ισοδύναμος με την κατανάλωση ενέργειας του Βελγίου($87.9$\foreignlanguage{english}{TWh}) και περίπου το μισό της κατανάλωσης ενέργειας των κέντρων δεδομένων παγκοσμίως($200$\foreignlanguage{english}{TWh}). Σε συνέχεια της προηγούμενης αναφοράς, ο \foreignlanguage{english}{de Vries} (2021), γνωστός από τις προηγούμενες μελέτες του για την ενεργειακή κατανάλωση του \foreignlanguage{english}{Bitcoin}, αναφέρει τις αρνητικές συνέπειες που έχει μια αύξηση της τιμής στην κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin}. Σύμφωνα με τον συγγραφέα, όσο τα έσοδα από ένα \foreignlanguage{english}{Bitcoin} είναι υψηλότερα από τα έξοδα για την εξόρυξη του, τότε ένας συμμετέχων στην αγορά μπορεί να αυξήσει την υπολογιστική του ισχύ και, κατά συνέπεια, να έχει περισσότερα κέρδη, και αυτό θα συνεχίζεται μέχρι να επέλθει η ισορροπία στην αγορά. Σύμφωνα με αυτό το απλό οικονομικό μοντέλο και το γεγονός ότι τα έξοδα ενός \foreignlanguage{english}{miner} είναι το σύστημα του και η ελεκτρική ενέργεια που καταναλώνει, μπορεί να γίνει μια εκτίμηση για τις πιθανές συνέπειες της κατανάλωσης ενέργειας του \foreignlanguage{english}{Bitcoin}. Τέλος αξιοποιώντας αυτό το πολύ απλό μοντέλο και υποθέτοντας ότι οι \foreignlanguage{english}{miners} πληρώνουν $0.05\$$ ανά κιλοβατώρα, με μια τιμή \foreignlanguage{english}{Bitcoin} $42.000\$$, με τέλη συναλλαγών να είναι το $10\%$ του εισοδήματος των \foreignlanguage{english}{miners}  και τέλος το $60\%$ του εισοδήματος τους να πηγαίνει για ηλεκτρική ενέργεια, εκτιμάται ότι η συνολική κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin} είναι $184$\foreignlanguage{english}{TWh} τον χρόνο. Αυτό είναι πολύ κοντά στην ηλεκτρική κατανάλωση όλων των κέντρων δεδομένων παγκοσμίως ($200$\foreignlanguage{english}{TWh}).\par
+Σύμφωνα με το άρθρο των \foreignlanguage{english}{Huynh et al.} (2022) χρησιμοποιώντας \foreignlanguage{english}{variance decompositions} σε συνδυασμό με \foreignlanguage{english}{realized semi-variances}, βρήκαν μια αμφίδρομη επίδραση μεταξύ της κατανάλωσης ενέργειας και των αποδόσεων του \foreignlanguage{english}{Bitcoin}, καθώς και μεταξύ της κατανάλωσης ενέργειας και των όγκων συναλλαγών. Με βάση τα αποτελέσματα τους, κατέληξαν στο συμπέρασμα ότι ο όγκος συναλλαγών \foreignlanguage{english}{Bitcoin} έχει σημασία για την κατανάλωση ενέργειας. Επίσης ,βρήκαν ότι μια πτώση στην τιμή του  \foreignlanguage{english}{Bitcoin} δεν μειώνει μόνο την κατανάλωση ενέργειας, αλλά επηρεάζει επίσης την μακροχρόνια σύνδεση μεταξύ τιμής και ενεργειακής κατανάλωσης. Οι  \foreignlanguage{english}{Meng et al.} (2023) μελετούν την αλληλεπίδραση της τιμής του \foreignlanguage{english}{Bitcoin}, των εκμπομπών \foreignlanguage{english}{$CO_2$} και της κανάλωσης ενέργειας. Χρησιμοποιώντας μια αυτοπαλίνδρομη διαδικασία με τυχαία μεταβλητότητα και χρονικές παραμέτρους, παρατηρούν την αλληλεπίδραση μεταξύ τον παραπάνω μεταβλητών, η οποία εξαρτάται από τον χρόνο. Με βάση την παραπάνω μελέτη, καταλήγουν στο συμπέρασμα ότι η τιμή του \foreignlanguage{english}{Bitcoin} επηρεάζει τόσο θετικα όσο και αρνητικά της εκπομπές άνθρακα και την κατανάλωση ενέργειας, με την πλειονότητα των επιδράσεων να είναι θετικές. Η θετική επίδραση μεταφράζεται σε αύξηση των εκπομπών και της κατανάλωσης ενέργειας με την αύξηση της τιμής του \foreignlanguage{english}{Bitcoin}. Σε περιόδους αρνητικής επίδρασης, οι εκπομπές και η κατανάλωση ενέργειας επηρεάζονται περισσότερο από εποχιακούς παράγοντες. Επίσης, Φαίνεται να υπάρχει μια αμφίδρομη σχέση μεταξύ των μεταβλητών, προτείνοντας κάποια μέτρα για την αντιμετώπιση της κατανάλωσης ενέργειας και εκπομπών \foreignlanguage{english}{$CO_2$}, όπως η χρήση βιώσημων πηγών ενέργειας και η χρήση πιο αποδοτικών μηχανημάτων, όπως τα \foreignlanguage{english}{ASIC}.\par
+Η παραπάνω έρευνα του \foreignlanguage{english}{Kohli et al.} (2023), συλλέγοντας από διάφορους δείκτες οι οποίοι εκτιμούν την κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin} απο το 2018-2021\foreignlanguage{english}{(Digiconomist and the Cambridge Bitcoin Energy Consumption Index (CBECI))}, συγκρίνει τους δείκτες κατανάλωσης ενέργειας με χώρες και διάφορες μεθόδους συναλλαγών όπως η \foreignlanguage{english}{Visa}. Αυτή η σύγκριση έδειξε ότι η κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin} τον Ιούλιο του 2021 είναι συγκρίσιμη με χώρες όπως η Σουηδία και Ρουμανία. Επιπλέον, η ανασκόπηση έδειξε ότι η μέδοθος συναλλαγών \foreignlanguage{english}{Visa} είναι πολύ πιο ενεργειακά αποτελεσματική από αυτή του \foreignlanguage{english}{Bitcoin}. Εντόπισε επίσης βασικά προβλήματα που προκαλούν την υψηλή κατανάλωση ενέργειας, όπως η υπερβολική δικτύωση και οι συσκευές εξόρυξης. Προτείνει και λύσεις όπως αλλαγή του μηχανισμού επικύρωσης συναλλαγών \foreignlanguage{english}{proof-of-work} με εναλλακτικές οπως \foreignlanguage{english}{PoSpace, PoST, PoA, uPoW, REM, PoS}. 
+
+\newpage
+
+\subsection{\foreignlanguage{english}{Bitcoin} και Ενεργειακή Κατανάλωση: Ποσοτική Ανάλυση}
+
+\paragraph{} Με την προσθήκη δεικτών που παρακολουθούν την εκτιμώμενη κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin}, σε συνδυασμό με την αυξανόμενη φήμη τους, δόθηκε η δυνατότητα σε εμπειρικές μελέτες να  διεξάγονται σχετικά με την κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin} σε εμπειρικό επίπεδο. Γνωστοί ως  \foreignlanguage{english}{Cambridge Bitcoin Electricity Consumption Index (CBECI)} και \foreignlanguage{english}{Digiconomist Bitcoin Energy Consumption Index}. Ο  \foreignlanguage{english}{Sizer} και \foreignlanguage{english}{Yilmaz} (2022) εξετάζουν την αιτιώδη σχέση μεταξύ του δείκτη της παγκόσμιας οικονομικής και πολιτικής αβεβαιότητας και της κατανάλωσης ηλεκτρικής ενέργειας \foreignlanguage{english}{Bitcoin}. Για την κατανάλωση ηλεκτρικής ενέργειας χρησιμοποίησαν τον \foreignlanguage{english}{Digiconomist Bitcoin Energy Consumption Index} και δεδομένα από την περίοδο 2011-2022. Εφαρμόζοντας ανάλυση αιτιότητας  \foreignlanguage{english}{Toda-Yamamoto}, βρήκαν ότι υστερήσεις και των δύο μεταβλητών βοηθούν η μία στην πρόβλεψη της άλλης, έχοντας έτσι μια σχέση \foreignlanguage{english}{Granger causality} σε επίπεδο σημαντικότητας $5\%$. Σύμφωνα με τους \foreignlanguage{english}{Calvo-Pardo et al.} (2022), χρησιμοποίησαν ένα μοντέλο \foreignlanguage{english}{feed-forward neural networks} για να μετρήσουν το αποτύπωμα άνθρακα από την εξόρυξη \foreignlanguage{english}{Bitcoin} για τα έτη 2017-2019. Χρησιμοποιώντας $42$ μεταβλητές στο μοντέλο και μεταφράζοντας τον δείκτη \foreignlanguage{english}{(CBECI)} σε ανθρακικό αποτύπωμα, βρήκαν αποτυπώματα άνθρακα που ανέρχονται για το 2017 έως το 2019 σε $2.77$, $16.08$, $14.99$ \foreignlanguage{english}{$MtCO_2$} αντίστοιχα. Τέλος, για τον τελικό υπολογισμό των εκπομπών άνθρακα στο περιβάλλον χρησιμοποιήθηκαν καταθέσεις  \foreignlanguage{english}{IPO} και διαστήματα εμπιστοσύνης. Για την τάξη μεγέθους, τα παραπάνω αποτελέσματα για το έτος 2018 είναι συγκρίσιμα με πολιτείες των ΗΠΑ όπως \foreignlanguage{english}{Maine}, \foreignlanguage{english}{New Hampshire} και μικρές χώρες όπως Βολιβία και το Σουδάν.\par
+Η ίδια χρονία με μια ακόμα δημοσίευση ήρθε για να ενισχύσει την βιβλιογραφία από τους \foreignlanguage{english}{Schinckus et al.} (2022). Χρησιμοποιώντας ένα μοντέλο \foreignlanguage{english}{vector error correction model}, εξετάζουν την σχέση μεταξύ του \foreignlanguage{english}{Bitcoin hashrate} και της κατανάλωσης ενέργειας για μια περίοδο από το 2016-2021. Σύμφωνα με τους συγγραφείς το \foreignlanguage{english}{Bitcoin hashrate} έχει θετική σχέση με την κατανάλωση ενέργειας, η οποία είναι ισχυρότερη βραχυπρόθεσμα. Ένα έντονο ενδιαφέρον έχει κλιμακωθεί σχετικά με τη βιωσιμότητα μια τεχνολογίας όπως το \foreignlanguage{english}{Bitcoin}. Χρησιμοποιώντας \foreignlanguage{english}{comprising dynamic ARDL simulations} και  \foreignlanguage{english}{general-to-specific VAR}, οι \foreignlanguage{english}{Sarkodie et al.} (2022) εξέτασαν την σχέση μεταξύ του όγκου συναλλαγών \foreignlanguage{english}{Bitcoin} με την κατανάλωση ενέργειας και το ανθρακικό αποτύπωμα του \foreignlanguage{english}{Bitcoin}. Ως προσέγγιση για την ετήσια κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin} χρησιμοποίησαν τον  \foreignlanguage{english}{Digiconomist Bitcoin Energy Consumption Index}, με την υπό εξέταση περίοδο να είναι από το 2017 έως το 2021. Με βάση τη μεθοδολογία και την υπό εξέταση περίοδο, βρήκαν ότι μια αύξηση του όγκου συναλλαγών \foreignlanguage{english}{Bitcoin} προκαλεί αύξηση του ανθρακικού και του ενεργειακού αποτυπώματος \foreignlanguage{english}{Bitcoin}  κατά $24\%$. Τέλος, ένα σοκ στον όγκο συναλλαγών προκαλεί αύξηση $46.54\%$ στο αποτύπωμα ενέργειας και άνθρακα.\par
+Ένα βασικό ερώτημα που προκύπτει από τις παραπάνω αναφορές και την γενική ανασκόπηση της βιβλιογραφίας είναι αν τα οφέλη που προσφέρει μια τεχνολογία όπως το \foreignlanguage{english}{Bitcoin} αξίζουν τις συνέπειες που θα προκαλέσει. Βασισμένοι στον \foreignlanguage{english}{Cambridge Bitcoin Electricity Consumption Index (CBECI)} ως εκτίμηση για την ενεργειακή κατανάλωση του  \foreignlanguage{english}{Bitcoin} σε καθημερινή βάση, και χρησιμοποιώντας ως ανεξάρτητες μεταβλητές τον μέσο όγκο συναλλαγών πέντε κρυπτονομισμάτων \foreignlanguage{english}{(bitcoin, ethereum, ripple, stellar, litecoin)} από το 2015 εως το 2021. Ο  \foreignlanguage{english}{Fahmy} (2022) χρησιμοποίησε ένα μοντέλο  \foreignlanguage{english}{bivariate vector autoregression (VAR)} και \foreignlanguage{english}{Granger causality test}. Επιβεβαιώνοντας μια μονόδρομη αιτιακή σχέση από τον όγκο συναλλαγών των κρυπτονομισμάτων στην κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin}. Επίσης, φαίνεται ότι τα σοκ στον όγκο συναλλαγών των κρυπτονομισμάτων  επηρεάζουν την κατανάλωση ενέργειας. Καταλήγοντας στο συμπέρασμα οτι το 2026 το ανθρακικό αποτύπωμα του  \foreignlanguage{english}{Bitcoin} θα ισοδυναμεί με το $1.6\%$ των παγκόσμιων εκπομπών. Οι \foreignlanguage{english}{Zhang et al.} (2023) εξέτασαν την σχέση της εξόρυξης \foreignlanguage{english}{Bitcoin} και της κλιματικής αλλαγής χρησιμοποιώντας \foreignlanguage{english}{granger causality} σε ποσοστιαία τμήματα. Βρήκαν ότι όταν οι τιμές \foreignlanguage{english}{$CO_2$} είναι υψηλές, τότε η κατανάλωση ενέργειας που προκύπτει από την εξόρυξη \foreignlanguage{english}{Bitcoin} έχει σημαντική προβλεπτική ικανότητα, υποδηλώνοντας μια ασύμμετρη σχέση μεταξύ των δύο μεταβλητών. Επίσης, βρήκαν ότι η μεταβλητότητα, απόδοση του \foreignlanguage{english}{Bitcoin}, το \foreignlanguage{english}{hashrate}, το μέγεθος \foreignlanguage{english}{blockchain} και η δυσκολία του δικτύου έχουν θετική επίδραση στην κατανάλωση ηλεκτρικής ενέργειας του \foreignlanguage{english}{Bitcoin} όταν αυτή βρίσκεται πάνω από την διάμεσο. \par
+Οι \foreignlanguage{english}{Sapra} και \foreignlanguage{english}{Shaikh} (2023) χρησιμοποίησαν ένα μοντέλο \foreignlanguage{english}{OLS}, \foreignlanguage{english}{ARDL} με δεδομένα από το 2018 έως το 2023 και \foreignlanguage{english}{Cambridge Bitcoin Electricity Consumption Index} ως εξαρτημένη μεταβλητή για την κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin}. Το μέγεθος του μπλοκ \foreignlanguage{english}{Bitcoin}, ο ρυθμός κατακερματισμού στο δίκτυο \foreignlanguage{english}{Bitcoin} και ο αριθμός των συναλλαγών \foreignlanguage{english}{Bitcoin} βρέθηκε οτι έχουν θετική σχέση με την κατανάλωση ενέργειας και επίσης έχουν σημαντική επιρροή σε αυτήν. Επιπροσθέτως, ο \foreignlanguage{english}{CIX200}, και η τιμή του  \foreignlanguage{english}{Ethereum} έχουν σημαντική επίδραση στην κατανάλωση ενέργειας. Συγκεκριμένα η μεταβλητή \foreignlanguage{english}{CIX200} έχει μια θετική συσχέτιση, ενώ η τιμή του \foreignlanguage{english}{Ethereum} έχει αρνητική επίδραση στην κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin} βραχυπρόθεσμα και θετική επίδραση μακροπρόθεσμα. Με βάση τη μελέτη των \foreignlanguage{english}{Ben Omrane et al.} (2023), χρησιμοποιώντας δεδομένα από το 2019 έως το 2020, Βρέθηκε ότι οι μακροοικονομικές ειδήσεις είναι εφικτό να αυξήσουν την κανάλωσης ενέργειας και, άρα το ανθρακικό αποτύπωμα των κρυπτονομισμάτων. Επίσης, οι αποφάσεις επιτοκίων που λαμβάνονται από τη  \foreignlanguage{english}{Federal Reserve} επηρεάζουν θετικά και σημαντικά τον όγκο συναλλαγών του \foreignlanguage{english}{Bitcoin}, με αποτέλεσμα την αυξημένη κατανάλωση ενέργειας. Σύμφωνα με τους \foreignlanguage{english}{Sapra et al.} (2024) χρησιμοποιώντας ένα μοντέλο \foreignlanguage{english}{VAR}, ένα test \foreignlanguage{english}{Granger causality}, τη συνδεσιμότητα \foreignlanguage{english}{Diebold-Yilmaz} και στοιχεία από την περίοδο 2019-2023, ως προσέγγιση για την κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin} χρησιμοποίησαν τον \foreignlanguage{english}{Cambridge Bitcoin-based Electricity Consumption Index(CBECI)}. Βάσει της μελέτης τους, βρήκαν αμφίδρομη  σχέση μεταξύ του δείκτη \foreignlanguage{english}{CVI} και της κατανάλωσης ενέργειας του \foreignlanguage{english}{Bitcoin}. Επίσης, βρήκαν ότι η τιμή του \foreignlanguage{english}{Bitcoin} επηρεάζει την κατανάλωση ενέργειας και τελος η κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin} είναι καθαρός αποδέκτης της αστάθειας.\par
+Την ίδια χρονιά, οι \foreignlanguage{english}{Jamali et al.} (2024) χρησιμοποίησαν τον δείκτη \foreignlanguage{english}{Cambridge Bitcoin Electricity Consumption Index (CBECI)} για την κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin}. Για την ανάλυση τους, χρησιμοποίησαν ένα μοντέλο εποπτευόμενης μηχανικής μάθησης(\foreignlanguage{english}{Regression}). Για δεδομένα εκπομπών πήραν στοιχεία από το 2017 έως το 2021, ενώ για την τιμή του \foreignlanguage{english}{Bitcoin} χρησιμοποιήσαν στοιχεία από το 2011 έως το 2021. Βρήκαν ότι υπάρχει μια μέτρια θετική συσχέτιση μεταξύ την κατανάλωσης ενέργειας του \foreignlanguage{english}{Bitcoin} και τον εκπομπών \foreignlanguage{english}{$CO_2$}, χρησιμοποιώντας τον \foreignlanguage{english}{Pearson correlation coefficient}. Σύμφωνα με το μοντέλο το οποιο χρησιμοποίησαν, βρήκαν στατιστικά σημαντική σχέση μεταξύ της τιμής του \foreignlanguage{english}{Bitcoin}, της κατανάλωσης ενέργειας του \foreignlanguage{english}{Bitcoin}, και των εκπομπών \foreignlanguage{english}{$CO_2$}, όπου οι οι εκπομπές \foreignlanguage{english}{$CO_2$}  χρησιμοποιήθηκαν ως εξαρτημένη μεταβλητή.          
+
+\newpage
+
+\subsection{\foreignlanguage{english}{Gradient Boosting}} 
+
+\paragraph{} Οι \foreignlanguage{english}{Li et al.} (2019) χρησιμοποιούν \foreignlanguage{english}{Tweets} για ένα χρονικό διάστημα $3.5$ εβδομάδων και τον όγκο συναλλαγών ώστε να προβλέψουν τη διακύμανση της τιμής ενός κρυπτονομίσματος που ονομάζεται \foreignlanguage{english}{ZClassic}. Ένα μοντέλο  \foreignlanguage{english}{Extreme Gradient Boosting Regression Tree} φάνηκε να είχε πολύ καλά αποτελέσματα στην ανάλυση συναισθήματος, με τις προβλεπόμενες τιμές να έχουν μια συσχέτιση $0.81$ με τα ιστορικά δεδομένα και στατιστικά σημαντικές τιμές προβλέψεις. Σύμφωνα με τον \foreignlanguage{english}{Yoon} (2021), ο οποίος χρησιμοποίησε τη μεγέθυνση του πραγματικού ΑΕΠ της Ιαπωνίας για να κάνει μια πρόβλεψη για το διάστημα 2001 έως 2018 η πρόβλεψη αυτή συγκρίθηκε με προβλέψεις που έχουν γίνει από το Διεθνές Νομισματικό Ταμείο και την Τράπεζα της Ιαπωνίας. Διαπιστώνει οτι η μέθοδος \foreignlanguage{english}{gradient boosting} επιτυγχάνει καλύτερη προβλεπτική ικανότητα και, επομένως μεγαλύτερη ακρίβεια από τα προαναφερθέντα μοντέλα, καθώς και από το μοντέλο \foreignlanguage{english}{random forest}. Χρησιμοποιεί ως μέτρα αξιολόγησης μέσο απόλυτο ποσοστό σφάλματος και τη ριζική μέση τετραγωνική απόκλιση. Μια ακόμα πρόβλεψη της ανάπτυξης του ΑΕΠ, όπως στο άρθρο που αναφέρθηκε προηγουμένως, χρησιμοποιώντας αλγόριθμους μηχανικής μάθησης που βασίζονται σε δέντρα, πραγματοποιήθηκε από τους \foreignlanguage{english}{Soybilgen} και \foreignlanguage{english}{Yazgan} (2021). Με τη διαφορά ότι η πρόβλεψη για την περίοδο από το 2000 έως το 2018 γίνεται ανά τρίμηνο και αφορα της ΗΠΑ. Χρησιμοποιώντας ένα σύνολο μεταβλητών που υπερβαίνει τις $100$, βρήκαν ότι τα μοντέλα που βασίζονται σε δέντρα υπερέχουν των γραμμικών μοντέλων, με ένα από τα μοντέλα να είναι το \foreignlanguage{english}{stochastic gradient tree boosting}. Επίσης, συγκρίνανε τα μοντέλα μηχανικής μάθησης με το μοντέλο πρόβλεψης της  \foreignlanguage{english}{FED}, το οποίο ονομάζεται \foreignlanguage{english}{GDPNow}, και βρήκαν ότι τα μοντέλα μηχανικής μάθησης υπερέχουν σε επιδόσεις πρόβλεψεις στην αρχή του τριμήνου. Την επόμενη χρονιά, έγινε μια βιβλιογραφική ανασκόπηση σχετικά με τις μεθοδολογίες μηχανικής μάθησης και τους λόγους για τους οποίους χρησιμοποιούνται αυτές οι μεθοδολογίες στην οικονομία της υγείας και στην έρευνα εκβάσεων απο τους \foreignlanguage{english}{Lee et al.} (2022). Συλλέχθηκαν δημοσιευμένες μελέτες από το 2020 έως το 2021 και βρέθηκε ότι το $86\%$ των δημοσιεύσεων τη χρησιμοποιούν για πρόβλεψη. Επίσης, οι πιο δημοφιλείς αλγόριθμοι μηχανικής μάθησης ήταν αλγόριθμοι που βασίζονται σε δέντρα, όπως το \foreignlanguage{english}{random forest, gradient boosting}. τα παραπάνω συμπεράσματα προέκυψαν από την ανάλυση 161 άρθρων.\par 
+Στο παραπάνω άρθρο των \foreignlanguage{english}{Smith} και \foreignlanguage{english}{Alvarez} (2022) χρησιμοποιείται ένα μοντέλο μηχανικής μάθησης, το \foreignlanguage{english}{XGBoost}, ώστε να κατηγοριοποιήσουν Ισπανικές εταιρείες σε πτωχευμένες ή μη, χρησιμοποιώντας δεδομένα από το 1992 έως το 2016, με ορίζοντα πρόβλεψης από $1$ έως $4$ χρόνια. Σε όλους τους ορίζοντες πρόβλεψης, το μοντέλο ηταν αρκετά ικανό στο να κατατάσσει σε ποια κατηγορία ανήκει η εκάστοτε εταιρεία. Επίσης, έγινε σύγκριση με άλλα μοντέλα, όπως το λογιστικό μοντέλο, από το οποίο είχε καλύτερα αποτελέσματα, καθώς και με άλλα μοντέλα μηχανικής μάθησης, στα οποία παρουσίασε παρόμοια αποτελέσματα. Η μελέτη του \foreignlanguage{english}{Atalan} (2023) χρησιμοποιεί μεθόδους μηχανικής μάθησης, με μία από αυτές να είναι η μέθοδος \foreignlanguage{english}{gradient boosting}, για να προβλέψει την τιμή του γάλακτος στην Τουρκία, με δεδομένα από το 2014 έως το 2021. Ο αλγόριθμος \foreignlanguage{english}{random forest} είχε την καλύτερη ακρίβεια, ενώ ο αλγόριθμος \foreignlanguage{english}{gradient boosting} είχε μέση ακρίβεια \foreignlanguage{english}{$97.3\%$}. Όλοι οι αλγόριθμοι που χρησιμοποιήθηκαν στην εν λόγω μελέτη κατέληξαν στο συμπέρασμα ότι είναι ικανοί να προβλέψουν την τιμή του γάλακτος. Έχοντας συλλέξει μηνιαία στοιχεία από το 1986 έως το 2019 για την τιμή του χρυσού, οι \foreignlanguage{english}{Ben Jabeur et al.} (2024) χρησιμοποίησαν ένα μοντέλο \foreignlanguage{english}{eXtreme Gradient Boosting (XGBoost)} καθώς και άλλα πέντε μοντέλα για να προβλέψουν την τιμή του χρυσού και στη συνέχεια να τα συγκρίνουν. Για να αξιολογηθούν οι επιδόσεις των μοντέλων στην πρόβλεψη, χρησιμοποιήθηκαν τέσσερα μέτρα απόδοσης πρόβλεψεις, με δύο από αυτά να είναι το \foreignlanguage{english}{root mean square error (RMSE), mean square error (MSE)}. Το μοντέλο \foreignlanguage{english}{ XGBoost} φαίνεται, βάσει της παραπάνω έρευνας, να επιτυγχάνει την καλύτερη απόδοση, έχοντας επιλέξει το $80\%$ των δεδομένων ως σετ εκπαίδευσης, ώστε να μπορεί να εκπαιδευτεί το μοντέλο, και το υπόλοιπο ως σετ ελέγχου, για αξιολογηθεί η απόδοση του μοντέλου σε νέα, άγνωστα δεδομένα. Τέλος οι \foreignlanguage{english}{Wijayanti et al.} (2024) χρησιμοποιούν τη μέθοδο \foreignlanguage{english}{XGBoost} για να προβλέψουν την παραγωγή ρυζιού, συλλέγοντας στοιχεία από τον \foreignlanguage{english}{Food and Agriculture Organization (FAO)}. Χρησιμηποιώντας ως μέτρα αξιολόγησης τα $R^2$, \foreignlanguage{english}{MAE, MSE}, το μοντέλο πέτυχε εξαιρετικές επιδόσεις σε σύγκριση με τα υπόλοιπα μοντέλα μηχανικής μάθησης\foreignlanguage{english}{(Random Forest (RF), Gradient Boost (GB), Bagging Regressor (BR), K-Nearest Neighbor (KNN))}, καθιστώντας το το καταλληλότερο μοντέλο για προβλέψεις παραγωγής ρυζιού.\par
+Η παρακάτω εργασία είναι δομημένη ως εξής. Στην επόμενη ενότητα($3$) αναλύουμε τα δεδομένα που θα χρησιμοποιήσουμε, εισάγοντας και κάποια περιγραφικά στατιστικά. Στη συνέχεια, εξηγούμε την προεπεξεργασία που έγινε στα δεδομένα, ώστε να είναι κατάλληλα για χρήση στο μοντελο. Ακολούθως, εξηγούμε το μοντέλο που θα χρησιμοποιήσουμε στην ανάλυση, τους λόγους που το επιλέξαμε, καθώς και την επιλογή των υπερπαραμέτρων του μοντέλου.  
+% --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+\newpage
+\section{ΜΕΘΟΔΟΛΟΓΙΑ}
+
+\subsection{Δεδομένα}
+
+\paragraph{} Στην παρακάτω υποενότητα θα μιλήσουμε για τα δεδομένα τα οποία έχουμε χρησιμοποιήσει στα επόμενα κεφάλαια, για τα περιγραφικά τους στατιστικά, καθώς και για τη γραφική απεικόνιση των μεταβλητών. Ως εξαρτημένη μεταβλητή έχουμε χρησιμοποιήσει την κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin}. Η μεταβλητή που χρησιμοποιήθηκε ως εξαρτημένη είναι ο \foreignlanguage{english}{Digiconomist Bitcoin Energy Consumption Index (energy\_consumption)}, που αποτελεί μια εκτίμηση της κατανάλωσης ενέργειας του \foreignlanguage{english}{Bitcoin}, και συλλέχθηκε από την ακόλουθη ιστοσελίδα: \foreignlanguage{english}{\url{https://digiconomist.net/}}. Ως εξαρτημένες μεταβλητές χρησιμοποιήσαμε τις \foreignlanguage{english}{average block size (Average\_Blocksize), blockchain size (Bitcoin\_Blockchain), hash rate (Bitcoin\_Hashrate), unique address (Unique\_Address), transaction per block (Transaction\_Per\_Block), unique transaction (Unique\_Transaction)} οι οποίες σχετίζονται με τη δομή και τη λειτουργία του \foreignlanguage{english}{Bitcoin}. Επιπλέον χρησιμοποιήσαμε και τις παρακάτω μεταβλητές: \foreignlanguage{english}{(Cost\_Per\_Transaction), miner revenue (Miner\_Revenue), transaction fee (Transaction\_Fee), market price of Bitcoin (Bitcoin\_Market\_Price), market capitalization of Bitcoin (Market\_Capitilization)} οι οποίες σχετίζονται με τα οικονομικά και χρηματοοικονομικά χαρακτηριστικά του \foreignlanguage{english}{Bitcoin}. Οι παραπάνω μεταβλητές μπορούν να βρεθούν στην ακόλουθη ιστοσελίδα, μαζί με σχετικές πληροφορίες: \foreignlanguage{english}{\url{https://data.nasdaq.com/institutional-investors}}. Για όλες τις μεταβλητές συλλέξαμε ημερήσια δεδομένα από τις 10 Φεβρουαρίου 2017 έως τις 7 Ιουλίου 2020. Επίσης, η μονάδα μέτρησης της εξαρτημένης μεταβλητής είναι τα \foreignlanguage{english}{TWh}.\par 
+Η επιλογή των παραπάνω μεταβλητών ως εξαρτημένων για την κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin} έγινε με βάση τη βιβλιογραφία, όπως εξηγείται και παρακάτω ποιο αναλυτικά. Οι μεταβλητές \foreignlanguage{english}{Bitcoin\_Market\_Price, Average\_Blocksize, Transaction\_Fee} χρησιμοποιήθηκαν από τους \foreignlanguage{english}{de Roos} (2021) για τη δημιουργία ενός μοντέλου με το οποίο εκτίμησαν την κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin}. Οι \foreignlanguage{english}{Sapra} και \foreignlanguage{english}{Shaikh} (2023) χρησιμοποιώντας δύο μοντέλα, ένα \foreignlanguage{english}{OLS} και ενα \foreignlanguage{english}{ARDL}, βρήκαν ότι μεταβλητές όπως \foreignlanguage{english}{Bitcoin\_Hashrate, Unique\_Transaction} έχουν μια σημαντική θετική σχέση με την κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin} και συνεισφέρουν σημαντικά στην αυξανόμενη κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin}. Χρησιμοποιώντας ανάλυση \foreignlanguage{english}{Directional predictability}, οι \foreignlanguage{english}{Zhang et al.} (2023) βρήκαν ότι η μεταβλητή \foreignlanguage{english}{Bitcoin\_Blockchain} είναι κατάλληλη για να χρησιμοποιείται στην πρόβλεψη της κατανάλωσης ενέργειας του \foreignlanguage{english}{Bitcoin}. Σύμφωνα με τους \foreignlanguage{english}{Sarkodie et al.} (2022), βρήκαν μια μακροχρόνια σχέση μεταξύ της \foreignlanguage{english}{Market\_Capitilization} και της ενεργειακής κατανάλωσης του \foreignlanguage{english}{Bitcoin}. Επίσης, βρέθηκε μια αρνητική σχέση μεταξύ του \foreignlanguage{english}{Miner\_Revenue} και της ενεργειακής κατανάλωσης του \foreignlanguage{english}{Bitcoin} από τους \foreignlanguage{english}{Das} και \foreignlanguage{english}{Dutta} (2020), χρησιμοποιώντας \foreignlanguage{english}{quantile regression}. Τέλος, οι \foreignlanguage{english}{Jana et al.} (2022) χρησιμοποιούν όλες τις παραπάνω μεταβλητές που χρησιμοποιούμε και εμείς στην ανάλυση τους για να προβλέψουν την ενεργειακή κατανάλωση του \foreignlanguage{english}{Bitcoin}, τις οποίες συνέλεξαν και πρόσθεσαν στο μοντέλο τους ακολουθώντας τη βιβλιογραφία. Παρακάτω, ο Πίνακας $1$ περιέχει περιγραφικά στατιστικά για τις μεταβλητές που θα χρησιμοποιήσουμε στην ανάλυση μας, καθώς και διαγραμματά για την γραφική τους απεικόνιση.\par
+Υπολογίσαμε επίσης και τον συντελεστή διακύμανσης($CV$), ο οποίος επιτρέπει τη συγκρισιμότητα μεταξύ των μεταβλητών. Μεγαλύτερες τιμές αυτού του δείκτη υποδηλώνουν μεγαλύτερη μεταβλητότητα γύρω από τον μέσο όρο. Παρατηρούμε ότι οι μεγαλύτεροι συντελεστές διακύμανσης εμφανίζονται στις μεταβλητές \foreignlanguage{english}{energy\_consumption} και \foreignlanguage{english}{Transaction\_Fee}, και άρα αυτές παρουσιάζουν συγκριτικά τη μεγαλύτερη μεταβλητότητα γύρω από τον μέσο όρο σε σχέση με τις άλλες μεταβλητές. Αυτό μπορούμε να το διαπιστώσουμε και διαγραμματικά, καθώς παρατηρούμε ότι υπάρχει μεγάλη μεταβλητότητα στις χρονοσειρές τους. Παράλληλα, χρησιμοποιήσαμε τον συντελεστή συσχέτισης \foreignlanguage{english}{Pearson} για να εξετάσουμε αν υπάρχει γραμμική σχέση μεταξύ της εξαρτημένης μεταβλητής και των ανεξάρτητων. Η μηδενική υπόθεση είναι ότι δεν υπάρχει στατιστικά σημαντική γραμμική σχέση μεταξύ των δύο μεταβλητών. Μπορούμε να παρατηρήσουμε στον Πίνακα $2$, όπου υπάρχει και ο συντελεστής διακύμανσης($CV$), ότι υπάρχουν μεταβλητές όπως οι \foreignlanguage{english}{Bitcoin\_Blockchain, Bitcoin\_Hashrate, Miner\_Revenue, Bitcoin\_Market\_Price, Market\_Capitilization}, οι οποίες έχουν μια στατιστικά σημαντική αρνητική γραμμική συσχέτιση με την εξαρτημένη μεταβλητή \foreignlanguage{english}{energy\_consumption}, καθώς και μία ανεξάρτητη μεταβλητή(\foreignlanguage{english}{Transaction\_Fee}), η οποία έχει στατιστικά σημαντική θετική γραμμική συσχέτιση με την εξαρτημένη μεταβλητή. Παρ'όλα αυτά, η τιμή του στατιστικού μέτρου του συντελεστή συσχέτισης \foreignlanguage{english}{Pearson} είναι πολύ μικρή, κοντά στο μηδέν, σε όλες τις περιπτώσης, υποδεικνύοντας ότι υπάρχει πολύ μικρή γραμμική σχέση, είτε αρνητική είτε θετική, η οποία μπορεί να θεωρηθεί έως και αμελητέα. Αυτό που αναφέραμε χρησιμοποιώντας τον συντελεστή συσχέτισης \foreignlanguage{english}{Pearson} μπορούμε να το παρατηρήσουμε και στα Σχήματα 7 εως 12, όπου έχουμε χρησιμοποιήσει γραφήματα διασποράς για να οπτικοποιήσουμε την σχέση μεταξύ της εξαρτημένης μεταβλητής και των ανεξάρτητων μεταβλητών. Επομένως, και από τα γραφήματα διασποράς καταλήγουμε στο ίδιο συμπέρασμα, ότι δεν υπάρχει γραμμική σχέση της εξαρτημένης μεταβλητής με τις ανεξάρτητες. Στο ίδιο συμπέρασμα καταλήγουν και οι \foreignlanguage{english}{Jana et al.} (2022), οι οποίοι χρησιμοποίησαν τα τεστ \foreignlanguage{english}{Shapiro-Wilk, Frosini} για να εξετάσουν την κατανομή των μεταβλητών, τα test \foreignlanguage{english}{ADF, Zivot-Andrews (ZA)} για να εξετάσουν την στασιμότητα των μεταβλητών, και τέλος των \foreignlanguage{english}{Hurst\&Exponent}  για να εξετάσουν την αυτοσυσχέτιση των χρονοσειρών. Κατέληξαν στο συμπέρασμα ότι οι μεταβλητές εμφανίζουν μη παραμετρικά μοτίβα, δηλαδή δεν ακολουθούν κάποια γνωστή η συγκεκριμένη κατανομή και τα μοτίβα αλλάζουν με την πάροδο του χρόνου, με τα μοτίβα να μην είναι γραμμικά, χρησιμοποιώντας το ίδιο σύνολο μεταβλητών που χρησιμοποιούμε στην αναλυσή μας. Επομενώς, είναι κατάλληλη η επιλογή ενός μοντέλου μηχανικής μάθησης, καθώς είναι ικανό να μοντελοποιεί περίπλοκες μη γραμμικές σχέσεις που δεν ακολουθούν κάποια γνωστή κατανομή.
+
+\newpage
+
+\captionsetup{ singlelinecheck = false, labelsep = period ,labelfont = {bf}}
+
+\begin{table}[H]
+    \centering
+    \caption{ Περιγραφικά Στατιστικά.}
+    \begin{tabular}{c c c c c c c}
+    \hline
+            Μεταβλητές & Μέσος όρος & Διάμεσος & Τ.Α  & Ελάχιστο & Μέγιστο   \\
+    \hline
+         \foreignlanguage{english}{energy\_consumption}&$1.16e+16$ &$7.31e+15$ &$1.33e+16$ &$5.66e+09$ &$6.40e+16$ \\ 
+         \foreignlanguage{english}{Average\_Blocksize}&$1.00$ &$1.00$ &$0.17$ &$0.43$ &$1.41$ \\ 
+         \foreignlanguage{english}{Bitcoin\_Blockchain}&$191623.01$ &$188032.22$ &$52547.80$ &$102104.81$ &$286510.98$ \\
+         \foreignlanguage{english}{Cost\_Per\_Transaction}&$48.52$ &$46.17$ &$27.96$ &$6.38$ &$161.69$  \\ 
+         \foreignlanguage{english}{Bitcoin\_Hashrate}&$4.86e+07$ &$43047398.76$ &$3.69e+07$ &$2.92e+06$ &$1.36e+08$ \\ 
+         \foreignlanguage{english}{Miner\_Revenue}&$13220491.90$ &$12546757.96$ &$7747166.10$ &$1696707.27$ &$ 53191582.14$  \\ 
+         \foreignlanguage{english}{Unique\_Address}&$530423.60$ &$523827.0$ &$ 104344.03$ &$301131.00$ &$ 1072861.00$  \\ 
+         \foreignlanguage{english}{Transaction\_Fee}&$ 119.94$ &$39.74$ &$161.07$ &$9.97$ &$1495.95$  \\ 
+         \foreignlanguage{english}{Transaction\_Per\_Block}&$1906.03$ &$1975.68$ &$409.98$ &$834.13$ &$ 2762.54$  \\ 
+         \foreignlanguage{english}{Unique\_Transaction}&$282346.30$ &$287255.0$ &$ 59593.30$ &$131875.00$ &$ 490644.00$ \\ 
+         \foreignlanguage{english}{Bitcoin\_Market\_Price}&$6806.39$ &$6929.46$ &$ 3268.75$ &$927.93$ &$ 19498.68$  \\ 
+         \foreignlanguage{english}{Market\_Capitilization}&$1.19e+11$ &$1.22e+11$ &$5.74e+10$ &$1.52e+10$ &$ 3.35e+11$  \\
+    \hline
+    \multicolumn{6}{l}{Σημειώσεις: Τ.Α = τυπική απόκλιση, $xe+n = x* 10^n$}
+    
+    \end{tabular}  
+\end{table}
+
+\vspace{30pt}
+
+\begin{table}[H]
+    \centering
+    \caption{Κάποια επιπλέον Στατιστικά Μέτρα.}
+    \begin{tabular}{c c c}
+    \hline
+        Μεταβλητές & \foreignlanguage{english}{CV} & \foreignlanguage{english}{PCC}  \\
+    \hline
+        \foreignlanguage{english}{energy\_consumption} & 1.15 &  \\
+         \foreignlanguage{english}{Average\_Blocksize}& 0.17 & -0.005  \\
+         \foreignlanguage{english}{Bitcoin\_Blockchain}&0.27 &-0.080*** \\
+         \foreignlanguage{english}{Cost\_Per\_Transaction}&0.58 &-0.033 \\
+         \foreignlanguage{english}{Bitcoin\_Hashrate}&0.76 &-0.142***  \\
+         \foreignlanguage{english}{Miner\_Revenue}&0.59 & -0.051*  \\
+         \foreignlanguage{english}{Unique\_Address}&0.2 &0.018    \\
+         \foreignlanguage{english}{Transaction\_Fee}&1.34 & 0.064** \\
+         \foreignlanguage{english}{Transaction\_Per\_Block}&0.22 & 0.010 \\
+         \foreignlanguage{english}{Unique\_Transaction}&0.21 & 0.004  \\
+         \foreignlanguage{english}{Bitcoin\_Market\_Price}&0.48 & -0.053*  \\
+         \foreignlanguage{english}{Market\_Capitilization}&0.48 & -0.062**  \\
+    \hline
+     \multicolumn{3}{l}{$CV =$ Συντελεστής διακύμανσης} \\
+     \multicolumn{3}{l}{$PCC =$ Συντελεστής συσχέτισης \foreignlanguage{english}{Pearson}.} \\
+     \multicolumn{3}{l}{*** $p<0.01$, ** $p<0.05$, * $p<0.1$}
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+
+
+\begin{figure}[H]
+\includegraphics[scale = 0.83 ]{Figure_1.png}
+\caption{Οι Χρονοσειρές των μεταβλητών \foreignlanguage{english}{energy\_consumption, Average\_Blocksize}. }
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale = 0.83 ]{Figure_2.png}
+\caption{Οι Χρονοσειρές των μεταβλητών \foreignlanguage{english}{Bitcoin\_Blockchain, Cost\_Per\_Transaction.}}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale = 0.83 ]{Figure_3.png}
+\caption{Οι Χρονοσειρές των μεταβλητών \foreignlanguage{english}{Bitcoin\_Hashrate, Miner\_Revenue.}}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale = 0.83 ]{Figure_4.png}
+\caption{Οι Χρονοσειρές των μεταβλητών \foreignlanguage{english}{Unique\_Address, Transaction\_Fee}.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale = 0.83 ]{Figure_5.png}
+\caption{Οι Χρονοσειρές των μεταβλητών \foreignlanguage{english}{Transaction\_Per\_Block, Unique\_Transaction}.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale = 0.83 ]{Figure_6.png}
+\caption{Οι Χρονοσειρές των μεταβλητών \foreignlanguage{english}{Bitcoin\_Market\_Price,Market\_Capitilization}.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale = 0.83 ]{Figure_13.png}
+\caption{Παρατηρούμαι την σχέση μεταξύ του \foreignlanguage{english}{energy\_consumption, Average\_Blocksize}.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale = 0.82 ]{Figure_14.png}
+\caption{Παρατηρούμαι την σχέση μεταξύ του \foreignlanguage{english}{energy\_consumption} με τις \foreignlanguage{english}{Bitcoin\_Blockchain, Cost\_Per\_Transaction}.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale = 0.80 ]{Figure_15.png}
+\caption{Παρατηρούμαι την σχέση μεταξύ του \foreignlanguage{english}{energy\_consumption} με τις \foreignlanguage{english}{Bitcoin\_Hashrate, Miner\_Revenue}.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale = 0.80 ]{Figure_16.png}
+\caption{Παρατηρούμαι την σχέση μεταξύ του \foreignlanguage{english}{energy\_consumption} με τις \foreignlanguage{english}{Unique\_Address, Transaction\_Fee}.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale = 0.80 ]{Figure_17.png}
+\caption{Παρατηρούμαι την σχέση μεταξύ του \foreignlanguage{english}{energy\_consumption} με τις \foreignlanguage{english}{Transaction\_Per\_Block, Unique\_Transaction}.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale = 0.80 ]{Figure_18.png}
+\caption{Παρατηρούμαι την σχέση μεταξύ του \foreignlanguage{english}{energy\_consumption} με τις \foreignlanguage{english}{Bitcoin\_Market\_Price, Market\_Capitilization}.}
+\end{figure}
+
+\newpage
+
+\subsection{Προεπεξεργασία των δεδομένων}
+
+\paragraph{} Είναι σημαντικό, προτού προχωρήσουμε στην ανάλυση του μοντέλου που θα χρησιμοποιήσουμε, να γίνει μια προεπεξεργασία των δεδομένων. Διότι χωρίς την κατάλληλη προεπεξεργασία, μπορεί να υπάρξουν σημαντικές αλλοιώσεις στα συμπεράσματα που θα προκύψουν. Για αρχή, ελέγχουμε εάν υπάρχουν ελλείπουσες τιμές, οι οποίες μπορούν να επηρεάσουν τα αποτελέσματα μας, εισάγοντας μεροληψία. Μετά από έλεγχο για ελλείπουσες τιμές, καταλήξαμε στο συμπέρασμα ότι καμία από τις μεταβλητές που χρησιμοποιούμε δεν έχει καμία ελλείπουσα τιμή. Στην συνέχεια, εξετάσαμε εάν υπάρχουν ακραίες τιμές στα δεδομένα μας, δηλαδή τιμές που διαφέρουν πολύ από το υπόλοιπο σύνολο δεδομένων. Χρησιμοποιήσαμε θηκόγραμμα για να οπτικοποιήσουμε το πρόβλημα των ακραίων τιμών, όπως μπορούμε να δούμε στα Σχήματα 13 έως 15. Επιπλέον, είναι ένας τρόπος απεικόνισης των δεδομένων χρησιμοποιώντας το μέγιστο, το ελάχιστο, τη διάμεσο, το πρώτο τεταρτημόριο και το τρίτο τεταρτημόριο. Ως ακραίες τιμές θεωρήσαμε τιμές που βρίσκονται κάτω απο το όριο $Q1 - 3 * IQR$ και πάνω από το όριο $Q3 + 3 * IQR$ αντίστοιχα. Οι μεταβλητές $Q1$ και $Q3$ αντιστοιχούν στο πρώτο και τρίτο τεταρτημόριο, αντίστοιχα, ενώ η μεταβλητή $IQR$ είναι η απόσταση μεταξύ του πρώτου από του τρίτου τεταρτημορίου. Με βάση το προαναφερθέν πλαίσιο, εντοπίστηκαν $158$ παρατηρήσεις οι οποίες θεωρήθηκαν ακραίες τιμές και αφαιρέθηκαν από το σύνολο δεδομένων, το οποίο αντιστοιχεί στο $12.7\%$ του συνολικού αριθμού παρατηρήσεων. Όσον αφορά τις ακραίες τιμές, σύμφωνα με τους \foreignlanguage{english}{Aguinis et al.} (2013), οι οποίοι, μέσω ανάλυσης της βιβλιογραφίας, έχουν καταλήξει σε διάφορες μεθοδολογίες που μπορεί να χρησιμοποιήσει ένας αναλυτής για να διαχειριστεί σωστά τις ακραίες τιμές. Με βάση το παραπάνω άρθρο οι, ακραίες τιμές δημιουργούν πρόβλημα στην προσαρμογή του μοντέλου μηχανικής μάθησης που θα χρησιμοποιήσουμε για πρόβλεψη. Μία από τις προτάσεις που θα χρησιμοποιήσουμε είναι να αναφέρουμε τα αποτελέσματα του μοντέλου με και χωρίς τις ακραίες τιμές, για να δούμε κατά πόσο η αφαίρεση τον ακραίων τιμών επηρεάζει την προσαρμογή του μοντέλου και, κατά συνέπεια, τα αποτελέσματα πρόβλεψης. \par 
+Οι \foreignlanguage{english}{Tian et al.} (2020) χρησιμοποίησαν ένα μοντέλο μηχανικής μάθησης(\foreignlanguage{english}{Gradient Boosting Decision Tree}) για να προβλέψουν αν ένα άτομο είναι αξιόπιστο για να λάβει δάνειο ή όχι. Στην ανάλυση τους, είχαν μεταβλητές που είχαν διαφορετικές μονάδες μέτρησης και διαφορετικές κλίμακες. Για να αντιμετωπίσουν αυτό το πρόβλημα και να βελτιώσουν την απόδοση και τη συγκρισιμότητα του μοντέλου μηχανικής μάθησης, χρησιμοποιήσαν μια μέθοδο κανονικοποιήσης που ονομάζεται κανονικοποίηση ελάχιστου-μέγιστου. Η ίδια μέθοδος θα χρησιμοποιήθεί και από εμάς για τους παραπάνω λόγους. Ποιο αναλυτικά, η συγκεκριμένη μέθοδος μετασχηματίζει όλα τα δεδομένα σε μια κλίμακα μεταξύ του $0$ και $1$, ώστε η σημασία ενός χαρακτηριστικού να μην επηρεάζεται από την κλίμακα του και, ως εκ τούτου, να μην επηρεάζει την προσαρμογή του μοντέλου.   
+
+\newpage
+
+\begin{figure}[H]
+\includegraphics[scale = 0.80 ]{Figure_7.png}
+\caption{Το θηκόγραμμα των μεταβλητών \foreignlanguage{english}{energy\_consumption, Average\_Blocksize, Bitcoin\_Blockchain, Cost\_Per\_Transaction}.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale = 0.80 ]{Figure_8.png}
+\caption{Το θηκόγραμμα των μεταβλητών \foreignlanguage{english}{Bitcoin\_Hashrate, Miner\_Revenue, Unique\_Address, Transaction\_Fee}.}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[scale = 0.80 ]{Figure_9.png}
+\caption{Το θηκόγραμμα των μεταβλητών \foreignlanguage{english}{Transaction\_Per\_Block, Unique\_Transaction, Bitcoin\_Market\_Price, Market\_Capitilization}.}
+\end{figure}
+
+\vspace{12pt}
+
+\subsection{\foreignlanguage{english}{Extreme Gradient Boosting (XGBoost)}}
+
+\paragraph{} Οι \foreignlanguage{english}{Chen} και \foreignlanguage{english}{Guestrin} (2016) περιγράφουν ένα σύστημα, το οποίο ονομάζεται \foreignlanguage{english}{XGBoost}, το οποίο βασίζεται στη μέθοδο μηχανικής μάθησης \foreignlanguage{english}{gradient tree boosting}. Προτείνουν έναν αλγόριθμο συστήματος που βελτιώνει τη διαχείριση δεδομένων, δίνοντας στο μοντέλο την δυνατότητα να διαχειρίζεται μεγάλο πλήθος δεδομένων με πολύ λιγότερους πόρους συγκριτικά με δημοφιλή υπάρχοντα συστήματα. Συγκρίνοντας το σύστημα \foreignlanguage{english}{XGBoost} με άλλες υλοποιήσεις που χρησιμοποιούν δέντρα ως αδύναμους μαθητές, όπως οι βιβλιοθήκες \foreignlanguage{english}{scikit-learn, Rsgbm}, σε προβλήματα κατάταξης, τα αποτελέσματα έδειξαν ότι η μέθοδος \foreignlanguage{english}{XGBoost} παράγει καλύτερα η παρόμοια αποτέλεσματα συγκριτικά με τα άλλα πακέτα σε πολύ ποιο σύντομο χρόνο. Επίσης, πραγματοποιήθηκε αξιολόγηση στη διαδικασία μάθησης της κατάταξης με το καλύτερο σύστημα για αυτή την εργασία (\foreignlanguage{english}{pGBRT}). Τα αποτελέσματα έδειξαν ότι είχε παρόμοιες επιδόσης, με το \foreignlanguage{english}{XGBoost} να είναι σημαντικά ταχύτερο. Τέλος, η δημιουργία του συγκεκριμένου συστήματος έδειξε ότι μπορεί να παρέχει υψηλού επιπέδου αποτελέσματα σε μια πλήθωρα εφαρμογών, όπως πρόβλεψη πωλήσεων καταστημάτων, η πρόβλεψη συμπεριφοράς πελατών, η πρόβλεψη ποσοστού κλικ σε διαφημίσεις, πρόβλεψη κινδύνου. Όσον αφορά, παρακάτω θα δούμε επιπλέον εφαρμογές του συγκεκριμένου αλγορίθμου και αποτελέσματα που αφορούν την επίδοση του. Οι \foreignlanguage{english}{Dey et al.} (2016) χρησιμοποίησαν ένα μοντέλο \foreignlanguage{english}{eXtreme Gradient Boosting (XGBoost)} για να προβλέψουν την τάση της χρηματιστηριακής αγοράς. Επιτυγχάνοντας ακρίβεια $87\%$ για περιόδους πρόβλεψης 60 και 90 ημερών, το \foreignlanguage{english}{XGBoost} αποδείχθηκε ότι έχει την καλύτερη ακρίβεια από όλα τα άλλα μοντέλα που χρησιμοποιούνται στο άρθρο(\foreignlanguage{english}{logistic regression, svm, Random Forest(RF), ANN(artificial neural network)}). Στην συνέχεια, οι \foreignlanguage{english}{Touzani et al.} (2018) χρησιμοποίησαν ένα μοντέλο \foreignlanguage{english}{XGBoost} για να προβλέψουν την κατανάλωση ενέργειας σε εμπορικά κτίρια. Χρησιμοποιώντας $410$ εμπορικά κτίρια, το μοντέλο \foreignlanguage{english}{XGBoost} πέτυχε τις καλύτερες αποδόσεις συγκριτικά με τα μοντέλα \foreignlanguage{english}{Time-of-Weekand-Temperature (TOWT), RF}. Χρησιμοποιώντας ένα μοντέλο \foreignlanguage{english}{XGBoost}, οι \foreignlanguage{english}{Carmona et al.} (2019) προβλέπουν την πτώχευση τραπεζών στον τομέα των ΗΠΑ για την περίοδο από το 2001 έως το 2015. Το μοντέλο πέτυχε ακρίβεια $94.74\%$, επιτυχγάνοντας μεγαλύτερη προβλεπτική ικανότητα σε σύγκριση με τα άλλα δύο μοντέλα που χρησιμοποιήθηκαν(\foreignlanguage{english}{random forest, logistic regression}).\par
+Εάν μια επιχείρηση έκλεισε λόγω ζημιών, θεωρείται μη επιτυχημένη επιχείρηση, ενώ μια επιχείρηση που είναι ακόμα ανοιχτή και έχει κέρδη θεωρείται επιτυχημένη με βάση αυτή την κατηγοριοποίηση. Οι \foreignlanguage{english}{Kipkogei et al.} (2021), χρησιμοποιώντας $205.245$ επιχειρήσεις για ένα χρονικό διάστημα από το 1996 έως το 2020, χρησιμοποίησαν δίαφορες μεθόδους μηχανικής μάθησης για να προβλέψουν τις επιχειρήσεις που είναι επιτυχημένες. Χρησιμοποιώντας διάφορα μέτρα αξιολόγησης όπως \foreignlanguage{english}{Accuracy, Precision score} κατέληξαν στο συμπέρασμα ότι τα μοντέλα με τη μεγαλύτερη ακρίβεια ήταν \foreignlanguage{english}{Gradient Boosting,  XGBoost}, σε σύγκριση με τα υπόλοιπα μοντέλα που ήταν παρόμοια με τις προηγούμενες αναφορές. Ένα ακόμη άρθρο χρησιμοποίησε μοντέλο \foreignlanguage{english}{XGBoost} με πολύ καλά αποτελέσματα. Σύμφωνα με τους \foreignlanguage{english}{Prasad et al.} (2022), χρησιμοποίησαν διάφορες μέθοδος μηχανικής μάθησης για να προβλέψουν την τάση του δείκτη μεταβλητότητας του \foreignlanguage{english}{S\&P 500(VIX)} σε ημερήσια και εβδομαδιαία συχνότητα. Τα μοντέλα μηχανικής μάθησης βασισμένα σε \foreignlanguage{english}{gradient boosting} αποδείχθηκαν ανώτερα από τη λογιστική παλινδρόμηση. Με βάση στοιχεία από κινεζικές εταιρείες για την περίοδο από το 1998 έως το 2014, οι \foreignlanguage{english}{Liu et al.} (2022) χρησιμοποίησαν διάφορα μοντέλα μηχανικής μάθησης για να προβλέψουν ποιες από τις επιχειρήσεις βρίσκονται σε κατάστατη οικονομικής δυσκολίας. Σύμφωνα με τα αποτελέσματα τους, τα μοντέλα \foreignlanguage{english}{gradient boosting} που βασίζονται σε δέντρα είχαν καλύτερες επιδόσεις από τα υπόλοιπα μοντέλα πρόβλεψης, όπως τα \foreignlanguage{english}{Bag.DT, Ada.DT, LR}. Με βάση τα παραπάνω, θα χρησιμοποιήσουμε το μοντέλο μηχανικής μάθησης \foreignlanguage{english}{XGBoost}, διότι μπορεί να διαχειρίζεται μεγάλα σύνολα δεδομένων χρησιμοποιώντας λιγότερους πόρους, καθιστώντας το πιο γρήγορο στην εκτέλεση. Επιπλέον, όπως μπορούμε να συμπεράνουμε από τις αναφορές, επιτυγχάνει πολύ καλά αποτελέσματα όσον αφορά την προβλεπτική του ικανότητα και έχει μεγάλη επιτυχία σε μια πληθώρα εφαρμογών. Στην συνέχεια, θα διεξάγουμε μια πιο αναλυτική ανάλυση σχετικά με το μοντέλο μηχανικής μάθησης που θα χρησιμοποιήσουμε στην ανάλυση.
+
+
+\subsubsection{Ανάλυση Μεθοδολογίας}
+
+\paragraph{} Η περιγραφή του μοντέλου που θα χρησιμοποιήσουμε βασίζεται στους \foreignlanguage{english}{Chen} και \foreignlanguage{english}{Guestrin} (2016). Για αρχή, ας υποθέσουμε ότι έχουμε ένα σύνολο χαρακτηριστηκών $x_i$. Με βάση τα χαρακτηριστικά, το μοντέλο προσπαθεί να προβλέψει το αποτέλεσμα, το οποίο θα το ονομάσουμε $\hat{y_i}$.
+
+\begin{equation}  
+\hat{y_i} = \sum_{k=1}^{K} f_k(x_i)
+\end{equation}
+
+\paragraph{} To $K$ αντιστοιχεί στο άθροισμα των συναρτήσεων που χρησιμοποιούνται για να προβλέψουν τη μεταβλητή $\hat{y_i}$. Η συνάρτηση $f_k(x_i)$ αντιστοιχεί σε ένα ανεξάρτητο δέντρο, το οποίο αποτελείται από φύλλα. Κάθε δέντρο χρησιμοποιεί τα χαρακτηριστικά για να διαχωρίσει τα δεδομένα και θα προτιμήσει το χαρακτηριστικό που χωρίζει τα δεδομένα πιο ξεκάθαρα στην προσπάθεια του να προβλέψει την τιμή του $\hat{y_i}$. Η τελική πρόβλεψη για το κάθε $\hat{y_i}$ θα προέρχεται από το άθροισμα των προβλέψεων κάθε ανεξάρτητου δέντρου. Για να εκπαιδεύσουμε το μοντέλο μας ώστε να επιτύχει τα καλύτερα δυνατά αποτελέσματα, χρησιμοποιούμε μια κανονικοποιημένη συνάρτηση κόστους, την οποία το μοντέλο πρέπει να ελαχιστοποιήσει. 
+
+\begin{equation}
+L(\phi) = \sum_{i}I(\hat{y_i},y_i) + \sum_{k}\Omega(f_k)
+\end{equation}
+
+\paragraph{} Το $I$ είναι μια συνάρτηση η οποία είναι διαφορίσιμη και κυρτή και χρησιμοποιείται για να μετρήσει τη διαφορά μεταξύ της τιμής πρόβλεψης($\hat{y_i}$) και της πραγματικής τιμής($y_i$) της μεταβλητής στόχου. Ο δεύτερος όρος($\Omega$) χρησιμοποιείται ως ποινή για την πολυπλοκότητα του μοντέλου, ώστε να αποτρέψει την υπερπροσαρμογή, η οποία προκαλείται όταν το μοντέλο προσαρμόζεται πάρα πολύ καλά στα δεδομένα εκπαίδευσης, με αποτέλεσμα να μην έχει καλή απόδοση σε νέα, άγνωστα δεδομένα. Με αυτόν τον τρόπο, το μοντέλο θα τείνει να επιλέγει πιο απλές δομές, αποφεύγοντας τέτοιου είδους προβλήματα. Αξίζει να σημειωθεί ότι όταν η παράμετρος κανονικοποίησης ισούται με τον μηδέν, η συνάρτηση κόστους μετρέπεται στη συνάρτηση κόστους που χρησιμοποιείται στο μοντέλο  \foreignlanguage{english}{gradient tree boosting}. Η βάση του μοντέλου είναι ο αλγόριθμος \foreignlanguage{english}{gradient tree boosting}, ο οποίος κάθε φορά κατασκευάζει ένα δέντρο, είτε ταξινόμησης είτε παλινδρόμησης, ανάλογα με τον τύπο της εξαρτημένης μεταβλητής, π.χ. αν είναι συνεχής η κατηγορική. Κάθε δέντρο που κατασκευάζεται ονομάζεται αδύναμος μαθητής\foreignlanguage{english}{(weak learner)}, ο οποίος προσπαθεί να διορθώσει τα σφάλματα που προκλήθηκαν από όλα τα προηγούμενα δέντρα, με στόχο να ελαχιστοποιήσει την συνάρτηση κόστους. Άρα, κάθε αδύναμος μαθητής στην ουσία χρησιμοποιεί το σφάλμα πρόβλεψης του προηγούμενου μοντέλου, δηλαδή τη διαφορά μεταξύ της εκτιμήσεις και τις πραγματικής τιμής της μεταβλητής, για να εκπαιδευτεί με σκοπό να βελτιώσει την πρόβλεψη και να μειώσει την συνάρτηση κόστους, προσεγγίζοντας έτσι την πραγματική τιμή.
+
+\begin{equation}
+    \hat{y_i}^{(t)} = \sum_{k=1}^{t}f_k(x_i) = \hat{y_i}^{(t-1)} + f_t(x_i)
+\end{equation}
+
+\paragraph{} Το $\hat{y_i}^{(t)}$ είναι το δέντρο $t$, το $\hat{y_i}^{(t-1)}$ είναι το προηγούμενο δέντρο πριν το $t$, και το $f_t(x_i)$ είναι το δέντρο που δημιουργήθηκε τώρα, με στόχο, κατά τη διάρκεια της εκπαίδευσεις του, να προσαρμοστεί στα υπολείμματα του προηγούμενου μοντέλου. Τέλος, το $t$ είναι το σύνολο των δέντρων. Όσον αφορά την περιγραφή της βάσης του μοντέλου \foreignlanguage{english}{XGBoost}, δηλαδή του  \foreignlanguage{english}{gradient tree boosting} χρησιμοποιήσαμε το άρθρο των \foreignlanguage{english}{Zhang et al.} (2023). Χρησιμοποιείται μια προσέγγιση δεύτερης τάξης, η οποία σχετίζεται με την ακρίβεια στην προσέγγιση μιας συνάρτησης, για να γίνει γρήγορη βελτιστοποίηση της αντικειμενικής συνάρτησης σε γενικό πλαίσιο εφαρμογής.  
+
+\begin{equation}
+    \tilde{L}^{(t)} = \sum_{i=1}^{n}[g_i f_t (x_i) + \frac{1}{2} h_i f_t^{2} (x_i) ] + \Omega(f_t) 
+\end{equation}
+
+\paragraph{} Όπου ο όρος $g_i$ είναι η πρώτη παράγωγος και η $h_i$ είναι η δεύτερη παράγωγος του πρώτο μέλους της εξίσωσης $(2)$. Η πρώτη παράγωγος υποδεικνύει προς ποια κατεύθυνση πρέπει να αλλάξουμε τις τιμές των παραμέτρων ώστε να μειωθεί η συνάρτηση κόστους. Η δεύτερη παράγωγος μας βοηθάει ως προς την αλλαγή του ρυθμού μεταβολής της συνάρτησης κόστους. Εκτός από την κανονικοποιημένη συνάρτηση κόστους, χρησιμοποιούνται και κάποιες επιπλέον τεχνικές για να αποφευχθεί η υπερπροσαρμογή. Μία από αυτές ονομάζεται \foreignlanguage{english}{Column Subsampling}, που σημαίνει ότι για κάθε δέντρο που εκπαιδεύεται με βάση τα σφάλματα του προηγούμενου, θα επιλέγεται τυχαία ένα υποσύνολο από τα συνολικά χαρακτηριστικά για να εκπαιδευτεί το μοντέλο. Τελος, ο αλγόριθμος \foreignlanguage{english}{XGBoost} χρησιμοποιεί έναν πιο αποτελεσματικό αλγόριθμο εύρεσης διάσπασης συγκριτικά με τις υπόλοιπες υλοποιήσεις, οι οποίες δοκιμάζουν όλους τους δυνατούς συνδυασμούς χαρακτηριστηκών ώστε να επιλέξουν αυτήν που διαχωρίζει τα δεδομένα πιο καθαρά, κάνοντας τους υπολογιστικά απαιτητικούς.
+
+\subsubsection{Υπερπαράμετροι}
+
+\paragraph{} Οι υπερπαράμετροι είναι βάρη ή τιμές με βάση τις οποίες διαμορφώνονται η δομή του μοντέλου και η διαδικασία μάθησης. Επομένως, οι συγκεκριμένες παράμετροι ρυθμίζονται πριν από τη διαδικασία εκπαίδευσης του μοντέλου. Παράδειγμα τέτοιων παραμέτρων είναι ο ρυθμός μάθησης, ο οποίος ελέγχει το βήμα προς την ελαχιστοποίηση της συνάρτησης κόστους μετά από κάθε επανάληψη και, άρα ελέγχει το πόσο γρήγορα μαθαίνει ένα μοντέλο. Μια άλλη παράμετρος είναι το μέγιστο βάθος, το οποίο ρυθμίζει το μέγιστο βάθος κόμβων που μπορεί να έχει ένα δέντρο, δηλαδή την απόσταση μεταξύ του κόμβου ρίζας και του πιο απομακρυσμένου κόμβου. Αυτή η συγκεκριμένη παράμετρος χρησιμοποιείται για να αποφύγουμε την υπερπροσαρμογή, καθώς πολύ περίπλοκα δέντρα θα προσαρμοστούν υπερβολικά καλά στο σύνολο εκπαίδευσεις και, ως αποτέλεσμα, δεν θα αποδίδουν σε νέα άγνωστα δεδομένα. Τέλος, οι παράμετροι \foreignlanguage{english}{alpha, lambda} είναι όροι που προστίθενται στη συνάρτηση κόστους που προσπαθούμε να ελαχιστοποιήσουμε, με σκοπό την αντιμετώπιση της υπερπροσαρμογής, βοηθώντας έτσι στην δημιουργία πιο απλών μοντέλων και στην επιλογή χαρακτηριστηκών.\par
+Για να μπορέσουμε να ρυθμίσουμε τις υπερπαραμέτρους ώστε να επιτύχουμε ένα μοντέλο με καλή προβλεπτική ικανότητα, θα χρησιμοποιήσουμε ένα μοντέλο που, μέσω ενός συνόλου δεδομένων εκτός δείγματος, θα εξασφαλίσει ότι δεν υπάρχει αλληλεπίδραση στη διαμόρφωση των παραμέτρων του μοντέλου. Μετά, με  μετρικές αξιολόγησης, θα αξιολογηθεί η απόδοση του μοντέλου. Θα εντοπίσει τις υπερπαραμέτρους που επιτυγχάνουν την καλύτερη απόδοση, οι οποίες θα χρησιμοποιηθούν στην διαδικασία εκπαίδευσης του μοντέλου. 
+
+\begin{equation}
+    \theta^{*} = \underset{\theta}{argmin} f(x|\theta)
+\end{equation}
+
+Όπου $θ$ είναι το διάνυσμα των υπερπαραμέτρων, το $x$ είναι το σύνολο δεδομένων εκτός δείγματος και η $f$ είναι η συνάρτηση σφάλματος, η οποία στην περίπτωση μας είναι το \foreignlanguage{english}{root mean square error}. 
+
+\begin{equation}
+    RMSE = \sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y_i})^{2}}
+\end{equation}
+
+To $y_i$ είναι η πραγματική τιμή και το $\hat{y_i}$ είναι η εκτιμημένη τιμή της εξαρτημένης μεταβλητής, αλλιώς μεταβλητής στόχου. Όσο μικρότερη είναι η τιμή του μέτρου αξιολόγησης, τόσο καλύτερη είναι η προβλεπτική ικανότητα του μοντέλου.\par
+Οι υπερπαράμετροι ρυθμός μάθησης, μέγιστο βάθος και ο αριθμός εκτιμητών($n$), ρυθμίστηκαν χρησιμοποιώντας Μπεϋζιανή βελτιστοποίηση. Η υπερπαράμετρος $n$ καθορίζει τον αριθμό των \foreignlanguage{english}{gradient boosted trees}. Στην Μπεϋζιανή βελτιστοποίηση, η συνάρτηση που θέλουμε να ελαχιστοποιήσουμε θεωρείται τυχαία μεταβλητή και της αποδίδεται μια κατανομή. Ο αλγόριθμος αναζητά μέσα σε αυτή την κατανομή μια παρατήρηση, η οποία είναι ένας συνδυασμός από υπερπαραμέτρους, και την εφαρμόζει στα δεδομένα εκτός δείγματος για να αξιολογηθεί η απόδοση. Καθώς αυτή η διαδικασία επαναλαμβάνεται, η κατανομή βελτιώνεται και ο αλγόριθμος μαθαίνει καλύτερα σε ποιες περιοχές να ψάξει και ποιες οχι. Επομένως, ο αλγόριθμος προσπαθεί να διαμορφώσει μια κατανομή για την συνάρτηση που επιδιώκουμε να βελτιστοποιήσουμε, λαμβάνοντας υπόψη και τις προηγούμενες πληροφορίες. Η διαδικασία θα σταματήσει όταν η συνάρτηση προς ελαχιστοποίηση σταθεροποιηθεί. Υπάρχουν και άλλοι τρόποι να βρεις τις βέλτιστες υπερπαραμέτρους, όπως το \foreignlanguage{english}{grid search}, το οποίο δοκιμάζει όλους τους δυνατούς συνδυασμούς υπερπαραμέτρων σε έναν δεδομένο χώρο .Επίσης, μπορούμε να θεωρήσουμε το διάνυσμα των υπερπαραμέτρων ως μια τυχαία μεταβλητή και να αναζητούμε τυχαία κάθε υπερπαράμετρο σε μια προκαθορισμένη κατανομή. Οι \foreignlanguage{english}{Di Persio} και \foreignlanguage{english}{Fraccarolo} (2022) χρησιμοποιούν ένα μοντέλο \foreignlanguage{english}{Gradient Boosting Decision Tree} για να προβλέψουν τη ζήτηση ενέργειας για μια εταιρεία ηλεκτρικής ενέργειας σε $7$ ζώνες της ιταλικής αγοράς ενέργειας. Για να βελτιστοποιήσουν τις υπερπαραμέτρους χρησιμοποίησαν Μπεϋζιανή βελτιστοποίηση, καθώς οι άλλες δύο προαναφερθείσες είτε είναι πολύ χρονοβόρες είτε δεν λαμβάνουν υπόψη τα προηγούμενα αποτελέσματα στην επόμενη παρατήρηση. Για αυτούς τους λόγους, επιλέγουμε και εμείς αυτή τη μεθοδολογία για να βρούμε τον βέλτιστο συνδυασμό υπερπαραμέτρων για το μοντέλο μας μέσα σε ένα λογικό χρονικό πλαίσιο. Η παραπάνω περιγραφή της Μπεϋζιανή βελτιστοποίησης έγινε βασισμένη στο άρθρο που αναφέραμε.    
+
+\newpage
+
+\section{ΑΝΑΛΥΣΗ ΑΠΟΤΕΛΕΣΜΑΤΩΝ}
+
+\subsection{Σετ εκπαίδευσης-δοκιμής}
+
+\paragraph{} Προτού αναλύσουμε τα αποτελέσματα και προχωρήσουμε στην πρόβλεψη, είναι σημαντικό το σύνολο δεδομένων να χωριστεί σε σετ εκπαίδευσης και σετ δοκιμής. Το σετ εκπαίδευσης είναι ένα υποσύνολο του συνόλου δεδομένων, το οποίο χρησιμοποιείται για να εκτιμήσουμε της παραμέτρους του μοντέλου, δηλαδή για να μάθει τις σχέσεις μεταξύ των μεταβλητών, ώστε μετά την εκπαίδευση να έχει καλή προβλεπτική ικανότητα. Μπορείς επίσης να χρησιμοποιήσεις το σετ εκπαίδευσης για πρόβλεψη, ώστε να έχεις μια εκτίμηση του πραγματικού σφάλματος πρόβλεψης. To σετ δοκιμής είναι ένα υποσύνολο του συνόλου δεδομένων, το οποίο δεν έχει έρθει σε επαφή με το μοντέλο μας, και θα χρησιμοποιήσουμε το μοντέλο για να κάνουμε πρόβλεψη σε αυτό το σύνολο δεδομένων. Έτσι, το μοντέλο μας δοκιμάζεται σε δεδομένα που δεν έχει ξαναδεί, προκειμένου να προσεγγίσουμε την προβλεπτική του ικανότητα σε πραγματικές καταστάσεις και να πάρουμε μια καλή εκτίμηση για το σφάλμα πρόβλεψης, αλλιώς γνωστό ως σφάλμα γενίκευσης. Τα δεδομένα εκπαίδευσης και δοκιμής επιλέγονται τυχαία από το σύνολο των δεδομένων, και πριν από τον διαχωρισμό γίνεται ένα τυχαίο ανακάτεμα των δεδομένων. Με αυτόν τον τρόπο, τείνουμε να προσεγγίσουμε καλύτερα ότι κάθε σύνολο δεδομένων θα περιλαμβάνει παρατηρήσεις που αντικατοπτρίζουν όλες τις πιθανές τιμές που μπορεί να πάρει το σύνολο, παρέχοντας στο μοντέλο μεγαλύτερη ποικιλία στις καταστάσεις στις οποίες μπορεί να βρεθεί μια μεταβλητή κατά την εκπαίδευση του. Με αυτόν τον τρόπο, το μοντέλο επιτυγχάνει μια πιο αμερόληπτη εκπαίδευση και, ως αποτέλεσμα οι σχέσεις που δημιουργεί το μοντέλο μεταξυ των μεταβλητών τείνουν να είναι πιο ανθεκτικές και ακριβείς, βελτιώνοντας παράλληλα την απόδοση του σε νέα, αθέατα δεδομένα. Το μοντέλο θα δοκιμαστεί σε διαφορετικές αναλογίες σετ εκπαίδευσης και δοκιμής, ώστε να έχουμε μια καλύτερη εκτίμηση της απόδοσης του και να αξιολογηθεί η προβλεπτική ικανότητα του μοντέλου υπό πολλές συνθήκες. Θα χωρίσουμε το σετ εκπαίδευσης και δοκιμής σε 3 αναλογίες: (80\%,20\%), (70\% 30\%) και (60\% 40\%) αντίστοιχα. Το (60\% 40\%) αντικατοπτρίζει συνθήκες όπου δεν υπάρχει μεγάλο δείγμα για να εκπαιδευτεί το μοντέλο και μεγάλο δείγμα αγνώστων δεδομένων στα οποία θα πρέπει παράλληλα να αποδώσει. Το (80\%,20\%) αντανακλά συνθήκες όπου υπάρχει ένα αρκετά μεγάλο σύνολο δεδομένων για την εκπαίδευση του μοντέλου. Στην συνέχεια, θα αναλύσουμε τα μέτρα αξιολόγησης που έχουμε χρησιμοποιήσει στην ανάλυση για να αξιολογήσουμε την προβλεπτική ικανότητα του μοντέλου(\foreignlanguage{english}{XGBoost}). 
+
+\newpage
+
+\subsection{Μετρικές αξιολόγησης} Σε ένα τέτοιο πλαίσιο ανάλυσης, μας ενδιαφέρει το μοντέλο μας να προβλέπει με υψηλή ακρίβεια την εξαρτημένη μεταβλητή σε δεδομένα που δεν έχει ξαναδεί, δηλαδή δεδομένα εκτός του συνόλου εκπαίδευσης. Για να μπορέσουμε να αξιολογήσουμε την απόδοση του μοντέλου, η βασική ιδέα είναι να συγκρίνουμε τις τιμές της εξαρτημένης μεταβλητής που προέκυψαν από την πρόβλεψη του μοντέλου στο σετ δοκιμής και να τις  συγκρίνουμε με τις πραγματικές τιμές της εξαρτημένης μεταβλητής στο σετ δοκιμής. Η διαφορά μεταξύ της προβλεπόμενης τιμής από το σετ δοκιμής και της πραγματικής τιμής απο το σετ δοκιμής της εξαρτημένης μεταβλητής ονομάζεται σφάλμα πρόβλεψης. Υπάρχουν πολλές παραλλαγές, καθεμία από τις οποίες δίνει έμφαση σε διαφορετική πτυχή του σφάλματος πρόβλεψης. Παρακάτω θα γίνει αναφορά στα μέτρα που χρησιμοποιήσαμε στην ανάλυση. Το πρώτο μέτρο αξιολόγησης με το οποίο θα ξεκινήσουμε την αναφορά ονομάζεται \foreignlanguage{english}{Nash-Sutcliffe Efficiency (NSE)}.
+
+\begin{equation}
+    NSE = 1 - \frac{\sum_{t=1}^{N}(\hat{y_t} - y_t)^2}{\sum_{t=1}^{N}(y_t - \Bar{y_t})^2}
+\end{equation}
+
+\paragraph{} Οπου $y_t$ είναι οι πραγματικές τιμές της εξαρτημένης μεταβλητής, $\hat{y_t}$ είναι οι προβλεπόμενες τιμές της εξαρτημένης μεταβλητής και, τελος $\Bar{y_t}$ είναι ο μέσος όρος της πραγματικής εξαρτημένης μεταβλητής. Το συγκεκριμένο μέτρο κυμαίνεται από $-\infty$ έως $1$. Όταν το $NSE<0$, σημαίνει ότι ο μέσος όρος της πραγματικής εξαρτημένης μεταβλητής έχει καλύτερη προβλεπτική ικανότητα από το μοντέλο. Όταν $NSE=0$, ο μέσος όρος της πραγματικής εξαρτημένης μεταβλητής έχει την ίδια προβλεπτική ικανότητα με το μοντέλο. Τέλος, όταν $NSE>0$, σημαίνει ότι το μοντέλο έχει καλύτερη προβλεπτική ικανότητα από τον μέσο όρο της πραγματικής εξαρτημένης μεταβλητής. Μάλιστα, οταν $NSE=1$ τότε το μοντέλο έχει τέλεια προβλεπτική ικανότητα. Στην συνέχεια, θα παρουσιάσουμε το μέτρο αξιολόγησης \foreignlanguage{english}{Root mean square error (RMSE)}.
+
+\begin{equation}
+    RMSE = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y_i})^2}
+\end{equation}
+
+\paragraph{} Το $n$ είναι ο αριθμός των παρατηρήσεων, το $y_i$ είναι οι πραγματικές τιμές της εξαρτημένης μεταβλητής και, τέλος, το $\hat{y_i}$ είναι οι προβλεπόμενες τιμές της εξαρτημένης μεταβλητής. Υπολογίζει τη μέση διαφορά που έχουν οι πραγματικές από τις προβλεπόμενες τιμές της εξαρτημένης μεταβλητής. Επίσης, αυτές οι διαφορές υψώνονται στο τετράγωνο ώστε κατά τη διάρκεια του αθροίσματος να μην απαλειφθούν τιμές με αντίθετο πρόσημο. Επίσης, επειδή οι διαφορές υψώνονται στο τετράγωνο, τιμωρεί περισσότερο τα μεγάλα σφάλματα, δηλαδή τις περιπτώσεις όπου η προβλεπόμενη τιμή έχει πολύ μεγάλη διαφορά από την πραγματική τιμή. Η τιμή του \foreignlanguage{english}{RMSE} είναι μεγαλύτερη ή ίση με το μηδέν. Όσο χαμηλότερη είναι η τιμή του \foreignlanguage{english}{RMSE}, τόσο καλύτερα έχει προσαρμοστεί το μοντέλο στα δεδομένα, δηλαδή όσο χαμηλότερη είναι η τιμή του μέτρου αξιολόγησης \foreignlanguage{english}{RMSE}, τόσο καλύτερη προβλεπτική ικανότητα έχει το μοντέλο μας. Όταν $\foreignlanguage{english}{RMSE}=0$ σημαίνει ότι το μοντέλο έχει προβλέψει ακριβώς όλες τις πραγματικές τιμές της εξαρτημένης μεταβλητής. Ύστερα, ένα ακόμη μέτρο που θα χρησιμοποιήσουμε στην ανάλυση μας ονομάζεται \foreignlanguage{english}{Mean absolute error(MAE)}.     
+
+\begin{equation}
+    MAE = \frac{1}{n} \sum_{i=1}^{n}|y_i - \hat{y_i}|    
+\end{equation}
+
+\paragraph{} Οι μεταβλητές $n$, $y_i$ και $\hat{y_i}$ έχουν την ίδια ακριβώς ερμηνεία όπως στο μέτρο αξιολόγησης \foreignlanguage{english}{RMSE}. Οι τιμές που μπορεί να πάρει το συγκεκριμένο μέτρο αξιολόγησης είναι μεγαλύτερες η ίσες με το μηδέν. Όσο πιο κοντά είναι οι τιμές στο μηδέν, τόσο καλύτερη προβλεπτική ικανότητα έχει το μοντέλο. Το συγκεκριμένο μέτρο αξιολόγησης μετρά το απόλυτο μέσο σφάλμα πρόβλεψης μεταξύ των πραγματικών τιμών και των προβλεπόμενων τιμών της μεταβλητής στόχου. Με τον όρο σφάλμα εννοούμε τη διαφορά μεταξύ της πραγματικής τιμής και της προβλεπόμενης τιμής της εξαρτημένης μεταβλητής. Το συγκεκριμένο μέτρο, σε αντίθεση με το \foreignlanguage{english}{RMSE}, δεν υψώνει τα σφάλματα στο τετράγωνο, δίνοντας σε όλα το ίδιο βάρος στην τελική τιμή. Τέλος, ένα ακόμα μέτρο απόδοσης του μοντέλου που θα χρησιμοποιήσουμε είναι το \foreignlanguage{english}{Index of Agreement (IA)}, το οποίο θα αναλύσουμε παρακάτω. 
+
+\begin{equation}
+    IA = 1 - \frac{\sum_{i=1}^{n}(y_i - \hat{y_i})^2}{\sum_{i=1}^{n}(|\hat{y_i} - \Bar{y}| + |y_i - \Bar{y}|)^2}
+\end{equation}
+
+\paragraph{} Οι παραπάνω μεταβλητές($y_i$, $\hat{y_i}$, $\Bar{y}$) έχουν αντίστοιχη ερμηνεία με το μέτρο \foreignlanguage{english}{NSE} που αναφέραμε προηγουμένως. Ο συγκεκριμένος δείκτης κυμαίνεται από $0$ έως $1$. Όσο πιο κοντά στο $1$ είναι ο δείκτης, τόσο περισσότερο συμφωνούν οι τιμές του μοντέλου, δηλαδή οι προβλεπόμενες τιμές, με τις παρατηρούμενες τιμές της εξαρτημένης μεταβλητής. Παρακάτω, χρησιμοποιώντας όλα τα μέτρα αξιολόγησης που αναφέραμε, θα αναλύσουμε τα αποτελέσματα του μοντέλου.\par
+Τα μέτρα απόδοσης που αναφέρθηκαν στην συγκεκριμένη ενότητα χρησιμοποιούνται από τους \foreignlanguage{english}{Jana} και \foreignlanguage{english}{Ghosh} (2022) για να αξιολογήσουν ενα μοντέλο μηχανικής μάθησης \foreignlanguage{english}{random forest} σε συνδυασμό με μια τεχνική αποσύνθεσης \foreignlanguage{english}{MODWT}, με πλαίσιο ανάλυσης την πρόβλεψη της τιμής του φυσικού αερίου.
+
+
+
+\subsection{Αποτελέσματα}
+
+Οι διαφορετικές αναλογίες σετ εκπαίδευσης και σετ δοκιμής που αναφέρθηκαν στην ενότητα $4.1$ έχουν χρησιμοποιηθεί στην αξιολόγηση του μοντέλου \foreignlanguage{english}{XGBoost} χρησιμοποιώντας τα μέτρα απόδοσης που αναλύθηκαν στην ενότητα $4.2$. Παρακάτω, οι Πίνακες 3, 4 και 5 απεικονίζουν την απόδοση του μοντέλου \foreignlanguage{english}{XGBoost} όσον αφορά την πρόβλεψη της κατανάλωσης ενέργειας του \foreignlanguage{english}{Bitcoin}, κάτω από διαφορετικές αναλογίες σετ εκπαίδευσης και δοκιμής, χρησιμοποιώντας παράλληλα 4 μέτρα αξιολόγησης. Το \foreignlanguage{english}{XGBoost} είναι μια βιβλιοθήκη διαθέσιμη για το κοινό, η οποία χρησιμοποιείται από πολλές γλώσσες προγραμματισμού. Εμείς χρησιμοποιήσαμε τη γλώσσα προγραμματισμού \foreignlanguage{english}{python} και τον αλγόριθμο μηχανικής μάθησης \foreignlanguage{english}{xgboost.XGBRegressor} από την συγκεκριμένη βιβλιοθήκη, καθώς έχουμε συνεχή μεταβλητή ως εξαρτημένη (\foreignlanguage{english}{\url{https://xgboost.readthedocs.io/en/stable/}}).     
+
+\vspace{80pt}
+
+\begin{table}[H]
+    \centering
+    \caption{Επίδοση σε Αναλογία Σετ Εκπαίδευσης/Δοκιμής (80\%,20\%).}
+    \begin{tabular}{c c c}
+    \hline
+       Μέτρα αξιολόγησης  & Χωρίς Α.Τ & Με Α.Τ \\
+    \hline
+         Σετ εκπαίδευσης & & \\  
+       \foreignlanguage{english}{NSE}  & 0.50 & 0.23  \\
+        \foreignlanguage{english}{IA} & 0.80 & 0.51  \\
+        \foreignlanguage{english}{MAE} & 0.06 & 0.11  \\
+       \foreignlanguage{english}{RMSE} & 0.12 & 0.19 \\ 
+         Σετ δοκιμής& &  \\ 
+        \foreignlanguage{english}{NSE} &0.31 & 0.00  \\ 
+        \foreignlanguage{english}{IA} &0.72 & 0.37  \\ 
+         \foreignlanguage{english}{MAE}& 0.07 & 0.11 \\
+         \foreignlanguage{english}{RMSE}& 0.14 & 0.18  \\
+    \hline
+    \multicolumn{3}{l}{Μεταβλητη στοχος: Κατανάλωση ενέργειας} \\
+    \multicolumn{3}{l}{του \foreignlanguage{english}{Bitcoin}, Α.Τ= ακραίες τιμές.}
+    \end{tabular}
+\end{table}
+
+\vspace{12pt}
+
+\begin{table}[H]
+    \centering
+    \caption{Επίδοση σε Αναλογία Σετ Εκπαίδευσης/Δοκιμής (70\%,30\%).}
+    \begin{tabular}{c c c}
+    \hline
+       Μέτρα αξιολόγησης  & Χωρίς Α.Τ & Με Α.Τ \\
+    \hline
+         Σετ εκπαίδευσης & & \\  
+       \foreignlanguage{english}{NSE}  & 0.47 & 0.25  \\
+        \foreignlanguage{english}{IA} & 0.78 & 0.53  \\
+        \foreignlanguage{english}{MAE} & 0.07 & 0.12  \\
+       \foreignlanguage{english}{RMSE} & 0.12 & 0.19  \\ 
+         Σετ δοκιμής& &  \\ 
+        \foreignlanguage{english}{NSE} & 0.41 & 0.02  \\ 
+        \foreignlanguage{english}{IA} & 0.76 & 0.40  \\ 
+         \foreignlanguage{english}{MAE}& 0.07 & 0.11  \\
+         \foreignlanguage{english}{RMSE}& 0.12 & 0.18  \\
+    \hline
+    \multicolumn{3}{l}{Μεταβλητη στοχος: Κατανάλωση ενέργειας} \\
+    \multicolumn{3}{l}{του \foreignlanguage{english}{Bitcoin}, Α.Τ= ακραίες τιμές.}
+    \end{tabular}
+\end{table}
+
+
+\begin{table}[H]
+    \centering
+    \caption{Επίδοση σε Αναλογία Σετ Εκπαίδευσης/Δοκιμής (60\%,40\%).}
+    \begin{tabular}{c c c}
+    \hline
+       Μέτρα αξιολόγησης  & Χωρίς Α.Τ & Με Α.Τ \\
+    \hline
+         Σετ εκπαίδευσης & & \\  
+       \foreignlanguage{english}{NSE}  & 0.50 & 0.28  \\
+        \foreignlanguage{english}{IA} & 0.80 & 0.56  \\
+        \foreignlanguage{english}{MAE} & 0.07 & 0.12  \\
+       \foreignlanguage{english}{RMSE} & 0.12 & 0.19 \\ 
+         Σετ δοκιμής& &  \\ 
+        \foreignlanguage{english}{NSE} & 0.38 & -0.00  \\ 
+        \foreignlanguage{english}{IA} & 0.73 & 0.39 \\ 
+         \foreignlanguage{english}{MAE}& 0.07 & 0.12  \\
+         \foreignlanguage{english}{RMSE}& 0.13 & 0.19  \\
+    \hline
+    \multicolumn{3}{l}{Μεταβλητη στοχος: Κατανάλωση ενέργειας} \\
+    \multicolumn{3}{l}{του \foreignlanguage{english}{Bitcoin}, Α.Τ= ακραίες τιμές.}
+    \end{tabular}
+\end{table}
+
+\paragraph{} Αρχικά, μπορούμε να παρατηρήσουμε στους πίνακες 3, 4 και 5 οτι, με βάση τις ακραίες τιμές που ορίστηκαν στην ενότητα 3.2, εάν δεν τις αφαιρέσουμε από το σύνολο δεδομένων, επηρεάζουν αρνητικά την προσαρμογή και, την προβλεπτική ικανότητα του μοντέλου \foreignlanguage{english}{XGBoost}. Καθώς όλα τα μέτρα αξιολόγησης σε όλες τις αναλογίες σετ εκπαίδευσης και δοκιμής δείχνουν χειρότερα αποτελέσματα όταν επιλέγουμε να κρατήσουμε τις ακραίες τιμές συγκριτικά με το να τις αφαιρέσουμε, επομένως η επιλογή να τις αφαιρέσουμε ήταν σωστή, καθώς επηρεάζει την ικανότητα πρόβλεψης της μεταβλητής στόχου. Το μέτρο αξιολόγησης \foreignlanguage{english}{IA} φαίνεται να ξεχωρίζει σε σχέση με τα άλλα μέτρα, παράγοντας αποτελέσματα κοντά στην μονάδα σε όλες τις περιπτώσεις χωρίς ακραίες τιμές. Αντίστοιχα, σε σύγκριση με τα άλλα μέτρα αξιολόγησης, με ακραίες τιμές, δίνει πολύ καλύτερα αποτελέσματα. Σύμφωνα με τους  \foreignlanguage{english}{Legates} και  \foreignlanguage{english}{McCabe} (1999), το μέτρο αξιολόγησης \foreignlanguage{english}{IA} παρουσιάζει δυσκολίες στην ερμηνεία του και έχει παρατηρηθεί ότι εμφανίζει υψηλές τιμές σε σύγκριση με την πραγματική απόδοση του μοντέλου. Το μέτρο παρουσιάζει γενικά μεγάλη ευαισθησία στις ακραίες τιμές λόγω του τετραγώνου, γεγονός που οδηγεί σε παραπλανητικά μεγάλες τιμές. Παρόλο που χρησιμοποιείται για την αξιολόγηση μοντέλων μηχανικής μάθησης για τους παραπάνω λόγους δεν θα το λάβουμε υπόψη στα τελικά μας συμπεράσματα. Στην συνέχεια, όλοι οι παρακάτω σχολιασμοί της απόδοσης του μοντέλου θα αφορούν το σύνολο δεδομένων χωρίς ακραίες τιμές. Βλέπουμε ότι σχεδόν σε όλες τις αναλογίες σετ εκπαίδευσης και δοκιμής το μέτρο αξιολόγησης \foreignlanguage{english}{MAE} είναι σταθερό και ίσο με $0.07$. Αυτό σημαίνει ότι κατά μέσο όρο οι προβλεπόμενες τιμές απέχουν $0.07$ από τις πραγματικές τιμές της εξαρτημένης μεταβλητής, χωρίς να λαμβάνει υπόψη την κατεύθυνση αυτής της διαφοράς, αντιμετωπίζοντας όλα τα σφάλματα με τον ίδιο συντελεστή.\par
+Όσον αφορά το μέτρο αξιολόγησης \foreignlanguage{english}{RMSE}, είναι σταθερό και ίσο με $0.12$ σε όλες τις αναλογίες για το σετ εκπαίδευσης. Αυτό σημαίνει ότι οι προβλεπόμενες τιμές του μοντέλου \foreignlanguage{english}{XGBoost} έχουν, κατά μέσο όρο απόκλιση $0.12$ από τις πραγματικές τιμές της μεταβλητής κατανάλωση ενέργειας του \foreignlanguage{english}{Bitcoin}. Στην περίπτωση του σετ δοκιμής, η απόκλιση διαφέρει ανάλογα με την αναλογία εκπαίδευσης και δοκιμής. Η καλύτερη επίδοση, όσον αφορά αυτό το μέτρο παρατηρείται με την αναλογία $70\%,30\%$, με μέση απόκλιση $0.12$ ενώ η χειρότερη επίδοση παρατηρείται με την αναλογία $80\%,20\%$, με μέση απόκλιση $0.14$. Στην μέση βρίσκεται η αναλογία $60\%,40\%$, με μέση απόκλιση $0.13$. Σε όλες τις περιπτώσεις μπορούμε να παρατηρήσουμε ότι ισχύει \foreignlanguage{english}{RMSE > MAE}. Αυτό οφείλεται στο γεγονός ότι τα μεγάλα σφάλματα έχουν πολύ μεγάλη επίδραση στο μέτρο \foreignlanguage{english}{RMSE}, δηλαδή προβλεπόμενες τιμές που απέχουν πολύ από τις πραγματικές τιμές της μεταβλητής στόχου. Τιμωρώντας έτσι το μοντέλο όταν αποκλίνει σημαντικά στις προβλέψεις του σε σύγκριση με την πραγματική τιμή της εξαρτημένης μεταβλητής. Τέλος, έχουμε το μέτρο \foreignlanguage{english}{NSE}, για το οποίο θα συμβουλευτούμε τη βιβλιογραφία σχετικά με τις αποδεκτές τιμές, ώστε να θεωρείται ένα μοντέλο ικανό όσον αφορά την προβλεπτική του ικανότητα, και βάσει αυτού θα χαρακτηρίσουμε την απόδοση του μοντέλου μας. Συμφωνα με τους \foreignlanguage{english}{Eryani et al.} (2022), ένα μοντέλο είναι ικανοποιητικό εάν η τιμή του μέτρου \foreignlanguage{english}{NSE} είναι μεταξύ $0.36$ και $0.75$. Οι \foreignlanguage{english}{Ritter et al.} (2013) αναφέρουν ως αποδεκτή προβλεπτική ικανότητα του μοντέλου για τιμές $NSE\geqslant0.65$. Επίσης, αναφέρουν ότι όταν $RMSE>MAE$, μπορεί να είναι μια ένδειξη παρουσίας ακραίων τιμών. Επιπλέον, αναφέρουν ότι το μέτρο \foreignlanguage{english}{NSE} επηρεάζεται από ακραίες τιμές, καθώς η διαφορά της παρατηρούμενης τιμης με αυτή που υπολογίζεται από το μοντέλο τετραγωνίζεται, παρόμοια με το μέτρο \foreignlanguage{english}{RMSE}. Τέλος, όσον αφορά το μέτρο αξιολόγησης \foreignlanguage{english}{NSE}, οι \foreignlanguage{english}{Knoben et al.} (2019) αναφέρουν ότι η προσαρμογή του μοντέλου στις παρατηρούμενες τιμές είναι καλή όταν το μέτρο είναι $NSE>0$. Ο σχολιασμός, όπως αναφέρθηκε παραπάνω, εξακολουθεί να αφορά τα δεδομένα χωρίς ακραίες τιμές. Όσον αφορά το μέτρο \foreignlanguage{english}{NSE} στο Σετ εκπαίδευσης, σύμφωνα με την πλειοψηφία των αναφορών, το μοντέλο έχει μια ικανοποιητική προβλεπτική ικανότητα, καθώς οι τιμές κυμαίνονται από $0.47$ έως $0.50$,  ανάλογα με την αναλογία σετ εκπαίδευσης/δοκιμής. Ωστόσο, οι τιμές είναι μικρότερες από το $0.65$, οπότε με βάση αυτό το πλαίσιο, κατατάσσεται ως ένα μοντέλο με μη αποδεκτή προβλεπτική ικανότητα. Αυτό μπορεί να οφείλετε είτε στην πιθανή παρουσία ακραίων τιμών, καθώς το \foreignlanguage{english}{RMSE > MAE} σε συνδυασμό με την ευαισθησία του μέτρου σε ακραίες τιμές. Παρόμοια συμπεράσματα μπορούν να προκύψουν και από το σετ δοκιμής, με τη διαφορά ότι στην αναλογία σετ εκπαίδευσης/δοκιμής (80\%,20\%), το μοντέλο, σύμφωνα με την πλειοψηφία της βιβλιογραφίας, κρίνεται ότι έχει μη ικανοποιητική προβλεπτική ικανότητα, κάνοντας παράλληλα την αναλογία με την χειρότερη απόδοση όσον αφορά το σετ δοκιμής, λαμβάνοντας υπόψη όλα τα μέτρα αξιολόγησης της απόδοσης του μοντέλου \foreignlanguage{english}{XGBoost}.            
+
+
+\newpage
+
+\section{ΣΥΜΠΕΡΑΣΜΑΤΑ}
+\newpage
+
+
+\section{ΒΙΒΛΙΟΓΡΑΦΙΑ}
+\end{document}

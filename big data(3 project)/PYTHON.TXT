@@ -1,0 +1,776 @@
+# question 1.i
+
+#import libraries 
+import os
+import pandas as pd
+import statsmodels.api as sm 
+# Corrected path with 'giannakopoulos_8' and a raw string
+new_path = r'C:\Users\kwstasbenek\Desktop\giannakopoulo_8\Tsagkarakis_3h_ergasia\communities+and+crime'
+
+# Change to the corrected directory
+os.chdir(new_path)
+
+#list of atrribute names
+attribute_names = [
+    'state', 'county', 'community', 'communityname', 'fold', 'population', 'householdsize',
+    'racepctblack', 'racePctWhite', 'racePctAsian', 'racePctHisp', 'agePct12t21', 'agePct12t29',
+    'agePct16t24', 'agePct65up', 'numbUrban', 'pctUrban', 'medIncome', 'pctWWage', 'pctWFarmSelf',
+    'pctWInvInc', 'pctWSocSec', 'pctWPubAsst', 'pctWRetire', 'medFamInc', 'perCapInc', 'whitePerCap',
+    'blackPerCap', 'indianPerCap', 'AsianPerCap', 'OtherPerCap', 'HispPerCap', 'NumUnderPov',
+    'PctPopUnderPov', 'PctLess9thGrade', 'PctNotHSGrad', 'PctBSorMore', 'PctUnemployed', 'PctEmploy',
+    'PctEmplManu', 'PctEmplProfServ', 'PctOccupManu', 'PctOccupMgmtProf', 'MalePctDivorce',
+    'MalePctNevMarr', 'FemalePctDiv', 'TotalPctDiv', 'PersPerFam', 'PctFam2Par', 'PctKids2Par',
+    'PctYoungKids2Par', 'PctTeen2Par', 'PctWorkMomYoungKids', 'PctWorkMom', 'NumIlleg', 'PctIlleg',
+    'NumImmig', 'PctImmigRecent', 'PctImmigRec5', 'PctImmigRec8', 'PctImmigRec10', 'PctRecentImmig',
+    'PctRecImmig5', 'PctRecImmig8', 'PctRecImmig10', 'PctSpeakEnglOnly', 'PctNotSpeakEnglWell',
+    'PctLargHouseFam', 'PctLargHouseOccup', 'PersPerOccupHous', 'PersPerOwnOccHous',
+    'PersPerRentOccHous', 'PctPersOwnOccup', 'PctPersDenseHous', 'PctHousLess3BR', 'MedNumBR',
+    'HousVacant', 'PctHousOccup', 'PctHousOwnOcc', 'PctVacantBoarded', 'PctVacMore6Mos',
+    'MedYrHousBuilt', 'PctHousNoPhone', 'PctWOFullPlumb', 'OwnOccLowQuart', 'OwnOccMedVal',
+    'OwnOccHiQuart', 'RentLowQ', 'RentMedian', 'RentHighQ', 'MedRent', 'MedRentPctHousInc',
+    'MedOwnCostPctInc', 'MedOwnCostPctIncNoMtg', 'NumInShelters', 'NumStreet', 'PctForeignBorn',
+    'PctBornSameState', 'PctSameHouse85', 'PctSameCity85', 'PctSameState85', 'LemasSwornFT',
+    'LemasSwFTPerPop', 'LemasSwFTFieldOps', 'LemasSwFTFieldPerPop', 'LemasTotalReq',
+    'LemasTotReqPerPop', 'PolicReqPerOffic', 'PolicPerPop', 'RacialMatchCommPol', 'PctPolicWhite',
+    'PctPolicBlack', 'PctPolicHisp', 'PctPolicAsian', 'PctPolicMinor', 'OfficAssgnDrugUnits',
+    'NumKindsDrugsSeiz', 'PolicAveOTWorked', 'LandArea', 'PopDens', 'PctUsePubTrans', 'PolicCars',
+    'PolicOperBudg', 'LemasPctPolicOnPatr', 'LemasGangUnitDeploy', 'LemasPctOfficDrugUn',
+    'PolicBudgPerPop', 'ViolentCrimesPerPop'
+]
+#empty list to fill wth data
+data_list = []
+
+# Now open the file
+with open('communities.data', 'r') as values_file:
+    for line in values_file:
+         # Split each line into values using a comma as the delimiter
+        values = line.strip().split(',')
+        # Assuming that len(values) is the same as the number of attributes
+        if len(values) == len(attribute_names):
+            # Create a dictionary with attribute names as keys and values as values
+            data_dict = dict(zip(attribute_names, values))
+            # Append the dictionary to the list
+            data_list.append(data_dict)
+        else:
+            print(f"Skipping line: {line}")
+
+# Create a DataFrame from the list of dictionaries
+
+
+df = pd.DataFrame(data_list)
+
+
+# Display the DataFrame
+print(df)
+#in the df missing values are denoted as "?", this command replaces all "?" with NA
+df = df.replace('?', pd.NA)
+#drop missing values
+df = df.dropna()
+#copy of the df
+df_strings = df.copy()
+
+# Convert columns to numeric where possible
+for column in df_strings.columns:
+    try:
+        df_strings[column] = pd.to_numeric(df_strings[column])
+    except ValueError:
+        # Handle the case where conversion to numeric is not possible
+        pass
+
+# Display the DataFrame with non-numeric values kept as strings(there aren't any so it's just the original df but with the variables now recognized as numeric and not objects )
+print(df_strings)
+
+
+#df for indepent variables
+X = df_strings[['medIncome', 'whitePerCap', 'blackPerCap', 'HispPerCap', 'PctUnemployed', 'NumUnderPov',
+        'HousVacant', 'MedRent', 'NumStreet']]
+#df dependent variable
+y = df_strings['ViolentCrimesPerPop']
+#add constant to independent variables
+X = sm.add_constant(X)
+#OLS model 
+model = sm.OLS(y, X).fit()
+
+# Print the summary of the regression
+print(model.summary())
+
+
+
+# question 1.ii
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+
+# Corrected path with 'giannakopoulos_8' and a raw string
+new_path = r'C:\Users\kwstasbenek\Desktop\giannakopoulo_8\Tsagkarakis_3h_ergasia\communities+and+crime'
+
+# Change to the corrected directory
+os.chdir(new_path)
+
+
+# Multiply two matrices i.e. mat1 * mat2
+
+def matmultiply(mat1,mat2):
+    
+    return( np.matmul(mat1, mat2) )
+    
+
+
+
+# Calculate current value of cost function J(θ).
+# indV: matrix of independent variables, first column must be all 1s
+# depV: matrix (dimensions nx1)of dependent variable i.e.
+# This function calculates the mean squared error, a measure of the difference between predicted and actual values.
+def calculateCost(indV, depV, thetas):
+    return( np.sum( ((matmultiply(indV, thetas) - depV)**2) / (2*indV.shape[0]) ) )  
+    
+
+# Batch gradient descent
+# indV: matrix of independent variables, first column must be all 1s
+# depV: matrix (dimensions nx1) of dependent variable i.e.
+# alpha: value of learning hyperparameter. Default (i.e. if no argument provided)  0.01
+# numIters: number of iterations. Default (i.e. if no argument provided) 100
+# verbose: if True, print intermediate results during optimization
+# This function performs batch gradient descent to minimize the cost function and obtain optimal parameters (thetas).
+def batchGradientDescent(indV, depV, thetas, alpha=0.01, numIters=100, verbose=False):
+    calcThetas = thetas
+    costHistory = pd.DataFrame(columns=["iter", "cost"])
+
+    for i in range(0, numIters):
+       
+        # Calculate the predicted values
+        predictions = matmultiply(indV, calcThetas)
+        
+        # Calculate the errors
+        errors = predictions - depV
+        
+        # Update thetas using the gradient descent update rule
+        gradient = matmultiply(indV.T, errors) / indV.shape[0]
+        calcThetas = calcThetas - alpha * gradient
+        
+        if verbose:
+            print(f">>>> Iteration {i}")
+            print("       Calculate thetas:", calcThetas)
+        
+        # Calculate cost and store it in costHistory
+        cost = calculateCost(indV, depV, calcThetas)
+        costHistory = pd.concat([costHistory, pd.DataFrame([{"iter": i, "cost": cost}])])
+
+    return calcThetas, costHistory
+
+
+
+#list of atrribute names
+attribute_names = [
+    'state', 'county', 'community', 'communityname', 'fold', 'population', 'householdsize',
+    'racepctblack', 'racePctWhite', 'racePctAsian', 'racePctHisp', 'agePct12t21', 'agePct12t29',
+    'agePct16t24', 'agePct65up', 'numbUrban', 'pctUrban', 'medIncome', 'pctWWage', 'pctWFarmSelf',
+    'pctWInvInc', 'pctWSocSec', 'pctWPubAsst', 'pctWRetire', 'medFamInc', 'perCapInc', 'whitePerCap',
+    'blackPerCap', 'indianPerCap', 'AsianPerCap', 'OtherPerCap', 'HispPerCap', 'NumUnderPov',
+    'PctPopUnderPov', 'PctLess9thGrade', 'PctNotHSGrad', 'PctBSorMore', 'PctUnemployed', 'PctEmploy',
+    'PctEmplManu', 'PctEmplProfServ', 'PctOccupManu', 'PctOccupMgmtProf', 'MalePctDivorce',
+    'MalePctNevMarr', 'FemalePctDiv', 'TotalPctDiv', 'PersPerFam', 'PctFam2Par', 'PctKids2Par',
+    'PctYoungKids2Par', 'PctTeen2Par', 'PctWorkMomYoungKids', 'PctWorkMom', 'NumIlleg', 'PctIlleg',
+    'NumImmig', 'PctImmigRecent', 'PctImmigRec5', 'PctImmigRec8', 'PctImmigRec10', 'PctRecentImmig',
+    'PctRecImmig5', 'PctRecImmig8', 'PctRecImmig10', 'PctSpeakEnglOnly', 'PctNotSpeakEnglWell',
+    'PctLargHouseFam', 'PctLargHouseOccup', 'PersPerOccupHous', 'PersPerOwnOccHous',
+    'PersPerRentOccHous', 'PctPersOwnOccup', 'PctPersDenseHous', 'PctHousLess3BR', 'MedNumBR',
+    'HousVacant', 'PctHousOccup', 'PctHousOwnOcc', 'PctVacantBoarded', 'PctVacMore6Mos',
+    'MedYrHousBuilt', 'PctHousNoPhone', 'PctWOFullPlumb', 'OwnOccLowQuart', 'OwnOccMedVal',
+    'OwnOccHiQuart', 'RentLowQ', 'RentMedian', 'RentHighQ', 'MedRent', 'MedRentPctHousInc',
+    'MedOwnCostPctInc', 'MedOwnCostPctIncNoMtg', 'NumInShelters', 'NumStreet', 'PctForeignBorn',
+    'PctBornSameState', 'PctSameHouse85', 'PctSameCity85', 'PctSameState85', 'LemasSwornFT',
+    'LemasSwFTPerPop', 'LemasSwFTFieldOps', 'LemasSwFTFieldPerPop', 'LemasTotalReq',
+    'LemasTotReqPerPop', 'PolicReqPerOffic', 'PolicPerPop', 'RacialMatchCommPol', 'PctPolicWhite',
+    'PctPolicBlack', 'PctPolicHisp', 'PctPolicAsian', 'PctPolicMinor', 'OfficAssgnDrugUnits',
+    'NumKindsDrugsSeiz', 'PolicAveOTWorked', 'LandArea', 'PopDens', 'PctUsePubTrans', 'PolicCars',
+    'PolicOperBudg', 'LemasPctPolicOnPatr', 'LemasGangUnitDeploy', 'LemasPctOfficDrugUn',
+    'PolicBudgPerPop', 'ViolentCrimesPerPop'
+]
+#empty list to fill wth data
+data_list = []
+
+# Now open the file
+with open('communities.data', 'r') as values_file:
+    for line in values_file:
+         # Split each line into values using a comma as the delimiter
+        values = line.strip().split(',')
+        # Assuming that len(values) is the same as the number of attributes
+        if len(values) == len(attribute_names):
+            # Create a dictionary with attribute names as keys and values as values
+            data_dict = dict(zip(attribute_names, values))
+            # Append the dictionary to the list
+            data_list.append(data_dict)
+        else:
+            print(f"Skipping line: {line}")
+
+# Create a DataFrame from the list of dictionaries
+df = pd.DataFrame(data_list)
+
+
+# Display the DataFrame
+print(df)
+#in the df missing values are denoted as "?", this command replaces all "?" with NA
+df = df.replace('?', pd.NA)
+#drop missing values
+df = df.dropna()
+#copy of the df
+df_strings = df.copy()
+
+# Convert columns to numeric where possible
+for column in df_strings.columns:
+    try:
+        df_strings[column] = pd.to_numeric(df_strings[column])
+    except ValueError:
+        # Handle the case where conversion to numeric is not possible
+        pass
+
+# Display the DataFrame with non-numeric values kept as strings(there aren't any so it's just the original df but with the variables now recognized as numeric and not objects )
+print(df_strings)
+
+
+#df for indepent variables
+X = df_strings[['medIncome', 'whitePerCap', 'blackPerCap', 'HispPerCap', 'PctUnemployed', 'NumUnderPov',
+        'HousVacant', 'MedRent', 'NumStreet']]
+#df dependent variable
+y = df_strings['ViolentCrimesPerPop']
+
+# Add new column at the beginning representing the constant term b0
+X.insert(0, 'b0', 1)
+
+# Add to a new variable to make the role of clarity/readbility of the code
+independentVars = X
+
+
+# Initialize thetas with some random values.
+# We'll need (independentVars.shape[1])  theta values, one for each independent variable.
+# NOTE: First theta value is coefficient for variable in FIRST column in independent matrix independentVars, second theta variable is coefficient
+#       for second column in independent matrix independentVars etc
+iniThetas = []
+for i in range(0, independentVars.shape[1]):
+    iniThetas.append( np.random.rand() )
+
+initialThetas = np.array(iniThetas)
+
+# Everything is ok.
+# Run BATCH gradient descent and return 2 values: I) the vector of the estimated coefficients (estimatedCoefficients) and II) the values of the
+# cost function (costHistory)
+
+estimatedCoefficients, costHistory = batchGradientDescent(independentVars.to_numpy(), y.to_numpy(), initialThetas, 0.01, 1000, verbose=True)
+
+# Display the estimated coefficients
+print("Estimated Coefficients:", estimatedCoefficients)
+# Display the names of variables along with their estimated coefficients
+for var, coef in zip(independentVars.columns[1:], estimatedCoefficients[1:]):
+    print(f"{var}: {coef}")
+# Display now the cost function to see if alpha and the number of iterations were appropriate.
+costHistory.plot.scatter(x="iter", y="cost", color='red')
+plt.show()
+
+
+
+# question 2
+
+
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+
+# Corrected path with 'giannakopoulos_8' and a raw string
+new_path = r'C:\Users\kwstasbenek\Desktop\giannakopoulo_8\Tsagkarakis_3h_ergasia\communities+and+crime'
+
+# Change to the corrected directory
+os.chdir(new_path)
+
+
+# Multiply two matrices i.e. mat1 * mat2
+
+def matmultiply(mat1,mat2):
+    
+    return( np.matmul(mat1, mat2) )
+    
+
+
+
+# Calculate current value of cost function J(θ).
+ # indV: matrix of independent variables, first column must be all 1s
+# depV: matrix (dimensions nx1)of dependent variable i.e.
+# This function calculates the mean squared error, a measure of the difference between predicted and actual values.
+def calculateCost(indV, depV, thetas):
+    return( np.sum( ((matmultiply(indV, thetas) - depV)**2) / (2*indV.shape[0]) ) )  
+    
+
+def stochasticGradientDescent(indV, depV, learning_rate, num_iterations):
+#thetas is being initialized as a column vector of zeros, where the number of rows is equal to the number of features in the independent variable matrix (indV),
+#and there is only one column. Each element of this vector corresponds to a coefficient (or weight) associated with a feature in the linear regression model.
+    thetas = np.zeros((indV.shape[1], 1))
+#blank cost history list
+    cost_history = []
+# loop, in which each iteration, a random data point is selected from the dataset.
+#This is the key difference from batch gradient descent, where all data points are used in each iteration.(lower computational cost)    
+    for iteration in range(num_iterations):
+        for i in range(indV.shape[0]):
+# np.random.randint generates a random integer from a uniform distribution.
+#0 is the lower bound (inclusive), and indV.shape[0] is the upper bound (exclusive).
+#This line randomly selects an index from the range [0, indV.shape[0]). It's essentially picking a random row index from the data.
+            random_index = np.random.randint(0, indV.shape[0])
+            x_i = indV[random_index, :].reshape(1, -1)
+            y_i = depV[random_index, :].reshape(1, -1)
+            
+            #This represents the dot product or matrix multiplication between the feature vector x_i and the coefficient vector thetas,
+            # it's essentially the predicted value for the given data point. The error is calculated as the predicted value-the actual value.
+            #x_i.T transposes the feature vector, turning it from a row vector to a column vector, the transpose operation is necessary to ensure that the dimensions
+            #of the matrices align correctly for the matrix multiplication required in the gradient calculation.
+            #The gradient represents the direction and magnitude of the steepest increase in the cost function.
+            #It's essentially a vector of partial derivatives with respect to each parameter (theta).
+
+            error = matmultiply(x_i, thetas) - y_i
+            gradient = matmultiply(x_i.T, error) / x_i.shape[0]
+            
+            # Update thetas
+            thetas = thetas - learning_rate * gradient
+            
+        # Calculate and append the cost after each epoch
+        cost = calculateCost(indV, depV, thetas)
+        cost_history.append(cost)
+        
+        # Print the cost every 100 iterations
+        if iteration % 100 == 0:
+            print(f'Iteration {iteration}, Cost: {cost}')
+    
+    return thetas, cost_history
+
+
+#list of atrribute names
+attribute_names = [
+    'state', 'county', 'community', 'communityname', 'fold', 'population', 'householdsize',
+    'racepctblack', 'racePctWhite', 'racePctAsian', 'racePctHisp', 'agePct12t21', 'agePct12t29',
+    'agePct16t24', 'agePct65up', 'numbUrban', 'pctUrban', 'medIncome', 'pctWWage', 'pctWFarmSelf',
+    'pctWInvInc', 'pctWSocSec', 'pctWPubAsst', 'pctWRetire', 'medFamInc', 'perCapInc', 'whitePerCap',
+    'blackPerCap', 'indianPerCap', 'AsianPerCap', 'OtherPerCap', 'HispPerCap', 'NumUnderPov',
+    'PctPopUnderPov', 'PctLess9thGrade', 'PctNotHSGrad', 'PctBSorMore', 'PctUnemployed', 'PctEmploy',
+    'PctEmplManu', 'PctEmplProfServ', 'PctOccupManu', 'PctOccupMgmtProf', 'MalePctDivorce',
+    'MalePctNevMarr', 'FemalePctDiv', 'TotalPctDiv', 'PersPerFam', 'PctFam2Par', 'PctKids2Par',
+    'PctYoungKids2Par', 'PctTeen2Par', 'PctWorkMomYoungKids', 'PctWorkMom', 'NumIlleg', 'PctIlleg',
+    'NumImmig', 'PctImmigRecent', 'PctImmigRec5', 'PctImmigRec8', 'PctImmigRec10', 'PctRecentImmig',
+    'PctRecImmig5', 'PctRecImmig8', 'PctRecImmig10', 'PctSpeakEnglOnly', 'PctNotSpeakEnglWell',
+    'PctLargHouseFam', 'PctLargHouseOccup', 'PersPerOccupHous', 'PersPerOwnOccHous',
+    'PersPerRentOccHous', 'PctPersOwnOccup', 'PctPersDenseHous', 'PctHousLess3BR', 'MedNumBR',
+    'HousVacant', 'PctHousOccup', 'PctHousOwnOcc', 'PctVacantBoarded', 'PctVacMore6Mos',
+    'MedYrHousBuilt', 'PctHousNoPhone', 'PctWOFullPlumb', 'OwnOccLowQuart', 'OwnOccMedVal',
+    'OwnOccHiQuart', 'RentLowQ', 'RentMedian', 'RentHighQ', 'MedRent', 'MedRentPctHousInc',
+    'MedOwnCostPctInc', 'MedOwnCostPctIncNoMtg', 'NumInShelters', 'NumStreet', 'PctForeignBorn',
+    'PctBornSameState', 'PctSameHouse85', 'PctSameCity85', 'PctSameState85', 'LemasSwornFT',
+    'LemasSwFTPerPop', 'LemasSwFTFieldOps', 'LemasSwFTFieldPerPop', 'LemasTotalReq',
+    'LemasTotReqPerPop', 'PolicReqPerOffic', 'PolicPerPop', 'RacialMatchCommPol', 'PctPolicWhite',
+    'PctPolicBlack', 'PctPolicHisp', 'PctPolicAsian', 'PctPolicMinor', 'OfficAssgnDrugUnits',
+    'NumKindsDrugsSeiz', 'PolicAveOTWorked', 'LandArea', 'PopDens', 'PctUsePubTrans', 'PolicCars',
+    'PolicOperBudg', 'LemasPctPolicOnPatr', 'LemasGangUnitDeploy', 'LemasPctOfficDrugUn',
+    'PolicBudgPerPop', 'ViolentCrimesPerPop'
+]
+#empty list to fill wth data
+data_list = []
+
+# Now open the file
+with open('communities.data', 'r') as values_file:
+    for line in values_file:
+         # Split each line into values using a comma as the delimiter
+        values = line.strip().split(',')
+        # Assuming that len(values) is the same as the number of attributes
+        if len(values) == len(attribute_names):
+            # Create a dictionary with attribute names as keys and values as values
+            data_dict = dict(zip(attribute_names, values))
+            # Append the dictionary to the list
+            data_list.append(data_dict)
+        else:
+            print(f"Skipping line: {line}")
+
+# Create a DataFrame from the list of dictionaries
+df = pd.DataFrame(data_list)
+
+
+# Display the DataFrame
+print(df)
+#in the df missing values are denoted as "?", this command replaces all "?" with NA
+df = df.replace('?', pd.NA)
+#drop missing values
+df = df.dropna()
+#copy of the df
+df_strings = df.copy()
+
+# Convert columns to numeric where possible
+for column in df_strings.columns:
+    try:
+        df_strings[column] = pd.to_numeric(df_strings[column])
+    except ValueError:
+        # Handle the case where conversion to numeric is not possible
+        pass
+
+# Display the DataFrame with non-numeric values kept as strings(there aren't any so it's just the original df but with the variables now recognized as numeric and not objects )
+print(df_strings)
+
+
+#df for indepent variables
+X = df_strings[['medIncome', 'whitePerCap', 'blackPerCap', 'HispPerCap', 'PctUnemployed', 'NumUnderPov',
+        'HousVacant', 'MedRent', 'NumStreet']]
+#df dependent variable
+y = df_strings['ViolentCrimesPerPop']
+#add const in the form of an extra column at the begining having just ones in it
+# Add new column at the beginning representing the constant term b0
+X.insert(0, 'b0', 1)
+
+#The dependent variable y is reshaped into a column vector. This ensures that y is a 2D array with a single column
+y = y.values.reshape(-1, 1)
+# Add to a new variable to make the role of clarity/readbility of the code
+independentVars = X
+
+
+# Initialize thetas with some random values.
+# We'll need (independentVars.shape[1])  theta values, one for each independent variable. Basically we loop for each column(independent variable)
+# First theta value is coefficient for variable in FIRST column in independent matrix independentVars, second theta variable is coefficient
+# for second column in independent matrix independentVars etc
+iniThetas = []
+for i in range(0, independentVars.shape[1]):
+    iniThetas.append( np.random.rand() )
+#A NumPy array is a grid of values, all of the same type, and it is indexed by a tuple of nonnegative integers.
+#The number of dimensions is the rank of the array; the shape of an array is a tuple of integers giving the size of the array along each dimension
+initialThetas = np.array(iniThetas)
+
+# Everything is ok.
+# Run stochastic gradient descent and return 2 values: I) the vector of the estimated coefficients (estimatedCoefficients) and II) the values of the
+# cost function (costHistory)
+
+estimatedCoefficients, costHistory = stochasticGradientDescent(independentVars.to_numpy(), y, 0.01, 1000 )
+
+# Display the estimated coefficients
+print("Estimated Coefficients:", estimatedCoefficients)
+#converting costHisorty from list to df so that we can plot it later 
+cost_df = pd.DataFrame({"iter": range(len(costHistory)), "cost": costHistory})
+
+# Display the names of variables along with their estimated coefficients
+for var, coef in zip(independentVars.columns[1:], estimatedCoefficients[1:]):
+    print(f"{var}: {coef}")
+
+# Display now the cost function to see if alpha and the number of iterations were appropriate.
+cost_df.plot.scatter(x="iter", y="cost", color='red')
+plt.show()
+
+
+
+# question 5
+
+# Python program to change the current working directory. 
+import os
+
+# set working directory.
+os.chdir("C:\\Users\\admin\\OneDrive\\Υπολογιστής\\big data(3 project)")
+
+# Import pandas library for reading a CSV file.
+import pandas as pd
+
+# Read the csv file.
+forestfires=pd.read_csv("forestfires.csv",sep=",")
+
+# View the first 5 rows.
+print(forestfires.head())
+
+# View the last 5 rows.
+print(forestfires.tail())
+
+# Dimensions of the dataframe.
+print(forestfires.shape)
+
+# We need it so we can calculate the square root of a number.
+from math import sqrt 
+
+# We need it so we can calculate the mean of a number.
+import statistics
+
+# For linear regression analysis.
+from sklearn.linear_model import LinearRegression
+
+# Mean squared error loss.
+from sklearn.metrics import mean_squared_error  
+
+# K-Fold cross-validator.
+from sklearn.model_selection import KFold
+
+# For performing array processing.
+import numpy as np
+
+# i)
+
+
+
+# Function that will calculate the mean RMSE of test set.
+def RMSE_MEAN(data):
+
+# 10-Fold Cross Validation.
+    kf = KFold(n_splits=10)
+
+# Create an empty array where we will store the calculated RMSE values.
+    allRMSE = np.empty(shape=[0, 1])
+
+# Start now iterating over the partitioned dataset, selecting each time a different subset as the testing set.
+# split(forestfires) will split the dataset into 10 parts.
+# variables train_index and test_index will get the indexes of the original dataset (hhData)
+# that will constitute the training-set and testing-set respectively.
+    for train_index, test_index in kf.split(data): 
+    
+    # Train set.
+        trainingData = data.iloc[train_index,:]
+
+    # Test set.
+        testData = data.iloc[test_index,:]
+
+    # Using this command we will estimate a linear regression model(𝑎𝑟𝑒𝑎 = 𝛽1𝑡𝑒𝑚𝑝 + 𝛽2𝑤𝑖𝑛𝑑 + 𝛽3𝑟𝑎𝑖𝑛 + 𝛽0).
+        lm = LinearRegression(fit_intercept=True)
+
+    # We estimate a model from the training set with 'temp,' 'wind,' and 'rain' as independent variables and 'area' as dependent.
+        estimatedModel = lm.fit(trainingData.loc[:,['temp','wind','rain']], trainingData.loc[:,['area']])
+
+    # Now we will use the estimated model to predict the values of dependent variable (area) in test set.
+        predictedarea = estimatedModel.predict(testData.loc[:,['temp','wind','rain']])
+
+    # Calculate the Root Mean Squared Error (RMSE) for this testing set.
+        RMSE = sqrt(mean_squared_error(testData.loc[:,['area']], predictedarea))
+
+    # Store all the RMSE, so we can calculate the mean after.
+        allRMSE = np.append(allRMSE, RMSE)
+
+    # Calculate the mean of RMSE.
+    MeanRMSE= statistics.mean(allRMSE)
+
+    return MeanRMSE
+
+# Call the function to calculate the mean RMSE.
+result_i = RMSE_MEAN(forestfires)
+
+# Display the result.
+print("Final result (i): Mean RMSE of tests:", result_i, sep='')
+
+
+
+# ii)
+
+# Remove the rows that the variable area is <3.2 .
+forestfires=forestfires[forestfires.area<3.2]
+
+# View the first 5 rows.
+print(forestfires.head())
+
+# View the last 5 rows.
+print(forestfires.tail())
+
+# Dimensions of the dataframe.
+print(forestfires.shape)
+
+# Call the function with the filtered dataset.
+result_ii = RMSE_MEAN(forestfires)
+
+# Display the result.
+print("Final result (ii): Mean RMSE.small_fires of tests:", result_ii, sep='')
+
+
+
+# question 7.i
+
+#import necessary libraries
+import csv
+import pandas as pd
+from kmodes.kmodes import KModes
+import numpy as np
+# Specify the path to your CSV file
+csv_file_path1 = 'C:\\Users\\kwstasbenek\\Desktop\\giannakopoulo_8\\Tsagkarakis_3h_ergasia\\3hErgasia\\movies.csv'
+
+# Open the CSV file with specified encoding (e.g., UTF-8)
+with open(csv_file_path1, 'r', encoding='utf-8') as file:
+    # Create a CSV reader object
+    csv_reader = csv.reader(file)
+
+    # Convert the CSV data into a list of lists
+    data = [row for row in csv_reader]
+
+# Create a Pandas DataFrame from the list of lists
+movies_df = pd.DataFrame(data)
+print(movies_df)
+csv_file_path2 = 'C:\\Users\\kwstasbenek\\Desktop\\giannakopoulo_8\\Tsagkarakis_3h_ergasia\\3hErgasia\\ratings.csv'
+# Open the CSV file with specified encoding (e.g., UTF-8)
+with open(csv_file_path2, 'r', encoding='utf-8') as file:
+    # Create a CSV reader object
+    csv_reader = csv.reader(file)
+
+    # Convert the CSV data into a list of lists
+    data = [row for row in csv_reader]
+
+# Create a Pandas DataFrame from the list of lists
+ratings_df = pd.DataFrame(data)
+print(ratings_df)
+
+# Extract only the category variables (dummy variables) from the movies DataFrame(starting from the 3rd column) 
+categories_data = movies_df.iloc[:, 2:]
+
+# Choose the number of clusters (K) using the Elbow method
+# Assume that k_values is a list containing values from 2 to 100
+sum_of_squared_distances = []
+k_values = range(2, 101)
+#loop over each k in k_values
+for k in k_values:
+    #initialize kmodes cluster model
+    #init, Specifies the initialization method. 'Huang' is one of the initialization methods available in the KModes algorithm.
+    #It is a method that initializes the centroids based on the density of the categorical data.
+    #n_init specifies the number of times the K-modes algorithm will be run with different centroid seeds.
+    #This is done to mitigate the impact of random initialization, and the best result in terms of clustering cost will be retained.
+    #int=5 is the number of times the algorythm will be run with different centroid seeds. This is done to mitigate the effect of the random initialization
+    #of centroids at the begining of the algorythm, something which does affect the final outcome, basically it represents a trade-off between computational
+    #cost and obtaining a robust solution.
+    #the number 5 is chosen since it is not too big(high comutatonal cost) neither too small(loss in robustness of results)
+    kmeans = KModes(n_clusters=k, init='Huang', n_init=5, verbose=0)
+    #fits the model to the categories data
+    kmeans.fit_predict(categories_data)
+    #After fitting and predicting, this attribute stores the cost of the clustering, which is the sum of squared distances.
+    #The lower the cost, the better the clustering.
+
+    sum_of_squared_distances.append(kmeans.cost_)
+
+# Plot the Elbow graph
+import matplotlib.pyplot as plt
+#design the plot of the elbow graph
+plt.plot(k_values, sum_of_squared_distances, 'bx-')
+plt.xlabel('Number of Clusters (K)')
+plt.ylabel('Sum of Squared Distances')
+plt.title('Elbow Method For Optimal K')
+plt.show()
+
+# Choose the optimal number of clusters (K) based on the Elbow method
+#This funcion finds the index where the first derivative of the sum of squared distances is minimized
+optimal_k = np.argmin(np.diff(sum_of_squared_distances)) + 2  # Assuming K starts from 2
+print(f"Optimal number of clusters (K): {optimal_k}")
+print("doone")
+#re-run the k-clustering model with the optimal n of clsters
+kmeans = KModes(n_clusters=optimal_k, init='Huang', n_init=5, verbose=0)
+# fits k-model to categories and predict cluster assignment of each data point
+cluster_labels = kmeans.fit_predict(categories_data)
+#add column to movies_df with the cluster id for each data point 
+movies_df['clusterId'] = cluster_labels
+# Calculate the average rating for each movie
+average_ratings = ratings_df.groupby('movieId')['rating'].mean()
+#merge the two df based on the unique "movieId" left_on mean that the "movieId" column of the movies_df will be used as key for merging, while right_index=True that
+#index of the average_ratings will be used as key for merging, how='left', refers to the type of merge (left joint)
+#The resulting merged df will contain all columns of the movies_df + the average rating of each movie, if a movie doe not have a corresponding entry in average ratings
+#then the value of the column will be NaN 
+movies_df = pd.merge(movies_df, average_ratings, left_on='movieId', right_index=True, how='left')
+
+#Specifie the user for whom movie recommendations are being generated
+user_id = 198
+# extract ratings from the ratings_df for the specific user 
+user_ratings = ratings_df[ratings_df['userId'] == user_id]
+
+# Merge user_ratings_df and movies_df on movieId and clusterId
+user_ratings = pd.merge(user_ratings, movies_df[['movieId', 'clusterId']], on='movieId', how='left')
+
+# Group user ratings by clusterId and calculate the mean rating for each cluster
+cluster_avg_ratings = user_ratings.groupby('clusterId')['rating'].mean()
+
+# Display the average ratings for each cluster
+print("\nAverage Ratings for Each Cluster:")
+for cluster_id, avg_rating in cluster_avg_ratings.iteritems():
+    print(f"Cluster {cluster_id}: {avg_rating:.2f}")#2f is for the numer of digits displayed
+
+# Filter clusters with average rating >= 3.5(.index retrievs the index values(clusterId's))
+high_rated_clusters = cluster_avg_ratings[cluster_avg_ratings >= 3.5].index
+
+# Check if there are clusters with average rating >= 3.5
+if not high_rated_clusters.empty:
+    # For each high-rated cluster, find top 2 movies user hasn't seen
+    #empty df 
+
+    recommendations = pd.DataFrame()
+    for cluster_id in high_rated_clusters:
+        #keep only movies that belong to the current cluster
+        cluster_movies = movies_df[movies_df['clusterId'] == cluster_id]
+        #keep only the unrated movies using '~'
+        unrated_movies = cluster_movies[~cluster_movies['movieId'].isin(user_ratings['movieId'])]
+        
+        # Check if there are unrated movies in the cluster
+        if not unrated_movies.empty:
+            #if unrated movie in cluster select the top 2 (with the highest rating)
+            top_movies = unrated_movies.nlargest(2, 'rating')
+            #put the in the recommndations df
+            recommendations = recommendations.append(top_movies)
+
+    # Check if there are recommendations
+    if not recommendations.empty:
+        # Display recommendations
+        print("\nMovie Recommendations:")
+        #for each row in recommendations df 
+        for _, movie in recommendations.iterrows():
+            print(f"Movie Title: {movie['title']}, Average Rating: {movie['rating']:.2f}")
+    else:
+        print("\nSorry, no new movies to recommend from high-rated clusters!")
+
+else:
+    print("\nSorry, no high-rated clusters found for recommendations!")
+
+
+
+# question 7.ii
+
+import pandas as pd
+import numpy as np
+from sklearn.cluster import AgglomerativeClustering
+from scipy.cluster.hierarchy import dendrogram, linkage
+import matplotlib.pyplot as plt
+import csv
+from sklearn.preprocessing import StandardScaler
+# Specify the path to your CSV file
+csv_file_path = 'C:\\Users\\kwstasbenek\\Desktop\\giannakopoulo_8\\Tsagkarakis_3h_ergasia\\3hErgasia\\europe.csv'
+
+# Read the CSV file with specified encoding (e.g., UTF-8) and header row
+europe_df = pd.read_csv(csv_file_path, encoding='utf-8', header=0)  # first row column names 
+
+# Remove leading whitespaces from column names, since there are in almost everyone
+europe_df.columns = europe_df.columns.str.strip()
+
+# Display the DataFrame and its columns
+print(europe_df)
+print("Column Names:", europe_df.columns)
+
+# Set 'Country' column as the index
+#inplace=True specifies that the modification the modification operation should be performed directly on the object in memory, without creating a new object. 
+europe_df.set_index('Country', inplace=True)
+
+# Extract country names and features
+country_names = europe_df.index
+# iloc is a method in pandas that is used for integer-location based indexing.
+# The : symbol in the indexing represents "all," so [:, :] is selecting all rows and all columns from the DataFrame 
+numeric_features = europe_df.iloc[:, :] 
+# Convert features to numeric, non numeric items will be NaN 
+numeric_features = numeric_features.apply(pd.to_numeric, errors='coerce')
+# Drop any rows with NaN values
+numeric_features = numeric_features.dropna()
+#basically all this is done to create a new df containing the same data points as the original europe_df except for country which is string 
+
+#normalizing features
+scaler = StandardScaler()
+numeric_features_scaled = scaler.fit_transform(numeric_features)
+# Perform hierarchical clustering using AgglomerativeClustering
+n_clusters = 10
+
+cluster = AgglomerativeClustering(n_clusters=n_clusters, metric='euclidean', linkage='ward')#'ward' minimizes variance within clusters 
+cluster_labels = cluster.fit_predict(numeric_features)
+
+# Linkage matrix for dendrogram, contains indices of merged clusters as well as distance/dissimillarity between the merged clusters 
+linkage_matrix = linkage(numeric_features_scaled, method='ward')
+
+# Plot the dendrogram
+plt.figure(figsize=(15, 15))
+dendrogram(linkage_matrix, labels=country_names, orientation='top', distance_sort='descending')
+plt.title('Hierarchical Clustering Dendrogram')
+plt.xlabel('Country')   
+plt.ylabel('Distance')
+plt.show()

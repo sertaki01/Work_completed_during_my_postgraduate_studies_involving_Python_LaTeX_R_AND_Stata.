@@ -1,0 +1,681 @@
+# question 1.i .
+
+# Set the working directory
+setwd("C:/Users/kwstasbenek/Desktop/giannakopoulo_8/Tsagkarakis_3h_ergasia/communities+and+crime")
+
+# Read the data into a data frame
+df <- read.csv("communities.data", header = FALSE, na.strings = "?")
+
+# Define column names
+attribute_names <- c('state', 'county', 'community', 'communityname', 'fold', 'population', 'householdsize',
+                     'racepctblack', 'racePctWhite', 'racePctAsian', 'racePctHisp', 'agePct12t21', 'agePct12t29',
+                     'agePct16t24', 'agePct65up', 'numbUrban', 'pctUrban', 'medIncome', 'pctWWage', 'pctWFarmSelf',
+                     'pctWInvInc', 'pctWSocSec', 'pctWPubAsst', 'pctWRetire', 'medFamInc', 'perCapInc', 'whitePerCap',
+                     'blackPerCap', 'indianPerCap', 'AsianPerCap', 'OtherPerCap', 'HispPerCap', 'NumUnderPov',
+                     'PctPopUnderPov', 'PctLess9thGrade', 'PctNotHSGrad', 'PctBSorMore', 'PctUnemployed', 'PctEmploy',
+                     'PctEmplManu', 'PctEmplProfServ', 'PctOccupManu', 'PctOccupMgmtProf', 'MalePctDivorce',
+                     'MalePctNevMarr', 'FemalePctDiv', 'TotalPctDiv', 'PersPerFam', 'PctFam2Par', 'PctKids2Par',
+                     'PctYoungKids2Par', 'PctTeen2Par', 'PctWorkMomYoungKids', 'PctWorkMom', 'NumIlleg', 'PctIlleg',
+                     'NumImmig', 'PctImmigRecent', 'PctImmigRec5', 'PctImmigRec8', 'PctImmigRec10', 'PctRecentImmig',
+                     'PctRecImmig5', 'PctRecImmig8', 'PctRecImmig10', 'PctSpeakEnglOnly', 'PctNotSpeakEnglWell',
+                     'PctLargHouseFam', 'PctLargHouseOccup', 'PersPerOccupHous', 'PersPerOwnOccHous',
+                     'PersPerRentOccHous', 'PctPersOwnOccup', 'PctPersDenseHous', 'PctHousLess3BR', 'MedNumBR',
+                     'HousVacant', 'PctHousOccup', 'PctHousOwnOcc', 'PctVacantBoarded', 'PctVacMore6Mos',
+                     'MedYrHousBuilt', 'PctHousNoPhone', 'PctWOFullPlumb', 'OwnOccLowQuart', 'OwnOccMedVal',
+                     'OwnOccHiQuart', 'RentLowQ', 'RentMedian', 'RentHighQ', 'MedRent', 'MedRentPctHousInc',
+                     'MedOwnCostPctInc', 'MedOwnCostPctIncNoMtg', 'NumInShelters', 'NumStreet', 'PctForeignBorn',
+                     'PctBornSameState', 'PctSameHouse85', 'PctSameCity85', 'PctSameState85', 'LemasSwornFT',
+                     'LemasSwFTPerPop', 'LemasSwFTFieldOps', 'LemasSwFTFieldPerPop', 'LemasTotalReq',
+                     'LemasTotReqPerPop', 'PolicReqPerOffic', 'PolicPerPop', 'RacialMatchCommPol', 'PctPolicWhite',
+                     'PctPolicBlack', 'PctPolicHisp', 'PctPolicAsian', 'PctPolicMinor', 'OfficAssgnDrugUnits',
+                     'NumKindsDrugsSeiz', 'PolicAveOTWorked', 'LandArea', 'PopDens', 'PctUsePubTrans', 'PolicCars',
+                     'PolicOperBudg', 'LemasPctPolicOnPatr', 'LemasGangUnitDeploy', 'LemasPctOfficDrugUn',
+                     'PolicBudgPerPop', 'ViolentCrimesPerPop'
+)
+
+# Assign column names to the data frame
+colnames(df) <- attribute_names
+
+# Remove rows with missing values
+df <- na.omit(df)
+
+# Display the data frame
+print(df)
+
+# Create a data frame for independent variables
+X <- df[c('medIncome', 'whitePerCap', 'blackPerCap', 'HispPerCap', 'PctUnemployed', 'NumUnderPov',
+          'HousVacant', 'MedRent', 'NumStreet')]
+
+# Create a data frame for the dependent variable
+y <- df$ViolentCrimesPerPop
+
+# Add a constant to the independent variables
+X <- cbind(1, X)
+
+# Fit an OLS model
+model <- lm(y ~ ., data = X)
+
+# Print the summary of the regression
+print(summary(model))
+
+
+
+
+# question 2.
+
+# Load necessary libraries
+library(Matrix)
+
+# Set the working directory
+new_path <- "C:/Users/kwstasbenek/Desktop/giannakopoulo_8/Tsagkarakis_3h_ergasia/communities+and+crime"
+setwd(new_path)
+
+# Function to perform matrix multiplication
+matmultiply <- function(mat1, mat2) {
+  return(mat1 %*% mat2)
+}
+
+# Function to calculate the cost function J(θ)
+calculateCost <- function(indV, depV, thetas) {
+  return(sum(((matmultiply(indV, thetas) - depV)^2) / (2 * nrow(indV))))
+}
+# Stochastic Gradient Descent function
+stochasticGradientDescent <- function(indV, depV, learning_rate, num_iterations) {
+  thetas <- matrix(0, nrow = ncol(indV), ncol = 1)
+  cost_history <- numeric(0)
+  
+  for (iteration in 1:num_iterations) {
+    for (i in 1:nrow(indV)) {
+      # Select a random data point
+      random_index <- sample(1:nrow(indV), 1)
+      x_i <- as.matrix(indV[random_index, , drop = FALSE])
+      y_i <- as.matrix(depV[random_index, , drop = FALSE])
+      
+      # Calculate error and gradient for the selected data point
+      error <- x_i %*% thetas - y_i
+      gradient <- t(x_i) %*% error / nrow(x_i)
+      
+      # Update thetas
+      thetas <- thetas - learning_rate * gradient
+    }
+    
+    # Calculate and append the cost after each epoch
+    cost <- sum(((indV %*% thetas - depV)^2) / (2 * nrow(indV)))
+    cost_history <- c(cost_history, cost)
+    
+    # Print the cost every 100 iterations
+    if (iteration %% 100 == 0) {
+      cat("Iteration", iteration, ", Cost:", cost, "\n")
+    }
+  }
+  
+  return(list(thetas = thetas, cost_history = cost_history))
+}
+
+# Read data from file
+df <- read.csv("communities.data", header = FALSE)
+
+# Assuming that the column names are the same as in the Python code
+colnames(df) <- c(
+  'state', 'county', 'community', 'communityname', 'fold', 'population', 'householdsize',
+  'racepctblack', 'racePctWhite', 'racePctAsian', 'racePctHisp', 'agePct12t21', 'agePct12t29',
+  'agePct16t24', 'agePct65up', 'numbUrban', 'pctUrban', 'medIncome', 'pctWWage', 'pctWFarmSelf',
+  'pctWInvInc', 'pctWSocSec', 'pctWPubAsst', 'pctWRetire', 'medFamInc', 'perCapInc', 'whitePerCap',
+  'blackPerCap', 'indianPerCap', 'AsianPerCap', 'OtherPerCap', 'HispPerCap', 'NumUnderPov',
+  'PctPopUnderPov', 'PctLess9thGrade', 'PctNotHSGrad', 'PctBSorMore', 'PctUnemployed', 'PctEmploy',
+  'PctEmplManu', 'PctEmplProfServ', 'PctOccupManu', 'PctOccupMgmtProf', 'MalePctDivorce',
+  'MalePctNevMarr', 'FemalePctDiv', 'TotalPctDiv', 'PersPerFam', 'PctFam2Par', 'PctKids2Par',
+  'PctYoungKids2Par', 'PctTeen2Par', 'PctWorkMomYoungKids', 'PctWorkMom', 'NumIlleg', 'PctIlleg',
+  'NumImmig', 'PctImmigRecent', 'PctImmigRec5', 'PctImmigRec8', 'PctImmigRec10', 'PctRecentImmig',
+  'PctRecImmig5', 'PctRecImmig8', 'PctRecImmig10', 'PctSpeakEnglOnly', 'PctNotSpeakEnglWell',
+  'PctLargHouseFam', 'PctLargHouseOccup', 'PersPerOccupHous', 'PersPerOwnOccHous',
+  'PersPerRentOccHous', 'PctPersOwnOccup', 'PctPersDenseHous', 'PctHousLess3BR', 'MedNumBR',
+  'HousVacant', 'PctHousOccup', 'PctHousOwnOcc', 'PctVacantBoarded', 'PctVacMore6Mos',
+  'MedYrHousBuilt', 'PctHousNoPhone', 'PctWOFullPlumb', 'OwnOccLowQuart', 'OwnOccMedVal',
+  'OwnOccHiQuart', 'RentLowQ', 'RentMedian', 'RentHighQ', 'MedRent', 'MedRentPctHousInc',
+  'MedOwnCostPctInc', 'MedOwnCostPctIncNoMtg', 'NumInShelters', 'NumStreet', 'PctForeignBorn',
+  'PctBornSameState', 'PctSameHouse85', 'PctSameCity85', 'PctSameState85', 'LemasSwornFT',
+  'LemasSwFTPerPop', 'LemasSwFTFieldOps', 'LemasSwFTFieldPerPop', 'LemasTotalReq',
+  'LemasTotReqPerPop', 'PolicReqPerOffic', 'PolicPerPop', 'RacialMatchCommPol', 'PctPolicWhite',
+  'PctPolicBlack', 'PctPolicHisp', 'PctPolicAsian', 'PctPolicMinor', 'OfficAssgnDrugUnits',
+  'NumKindsDrugsSeiz', 'PolicAveOTWorked', 'LandArea', 'PopDens', 'PctUsePubTrans', 'PolicCars',
+  'PolicOperBudg', 'LemasPctPolicOnPatr', 'LemasGangUnitDeploy', 'LemasPctOfficDrugUn', 'PolicBudgPerPop', 'ViolentCrimesPerPop'
+)
+
+# Replace "?" with NA
+df[df == "?"] <- NA
+
+# Drop missing values
+df <- na.omit(df)
+
+# Extract independent variables
+X <- df[c('medIncome', 'whitePerCap', 'blackPerCap', 'HispPerCap', 'PctUnemployed', 'NumUnderPov',
+          'HousVacant', 'MedRent', 'NumStreet')]
+
+# Extract dependent variable
+y <- df$ViolentCrimesPerPop
+
+# Add a constant term (column of ones) to the independent variables
+X <- cbind(1, X)
+
+# Convert y to a matrix with one column
+y <- matrix(y, ncol = 1)
+
+# Initialize thetas with random values
+initialThetas <- runif(ncol(X))
+X <- as.matrix(X)
+y <- as.matrix(y)
+# Run stochastic gradient descent
+result <- stochasticGradientDescent(X, y, 0.01, 1000)
+
+# Display estimated coefficients
+cat("Estimated Coefficients:", result$thetas, "\n")
+
+# Display the names of variables along with their estimated coefficients
+for (var in names(X)[-1]) {
+  coef <- result$thetas[match(var, names(X))]
+  cat(var, ":", coef, "\n")
+}
+
+# Create a data frame for cost history
+cost_df <- data.frame(iter = seq_along(result$cost_history), cost = result$cost_history)
+
+# Display cost history
+print(cost_df)
+
+# Plot cost history
+plot(cost_df$iter, cost_df$cost, col = 'red', xlab = 'Iteration', ylab = 'Cost', main = 'Cost History')
+
+
+
+question 3.
+
+myData <- data.frame(y=numeric(0), x1=numeric(0),
+                     x2=numeric(0),
+                     x3=numeric(0),
+                     x4=numeric(0),
+                     x5=numeric(0),
+                     x6=numeric(0))
+for (i in 1:4){
+  myData[i,] <- runif(7, min=1, max=10)
+}
+rModel<-lm( y ~ ., data=myData)
+print(rModel$coefficients)
+# Check correlation matrix
+cor(myData)
+
+# Get the design matrix from the linear model
+design_matrix <- model.matrix(rModel)
+
+# Check the condition number
+condition_number <- kappa(design_matrix)
+print(condition_number)
+#check more diagnostics in the model 
+summary(rModel)
+
+
+
+question 4.
+
+# Clear R enviroment.
+rm(list = ls())
+
+# Set seed to encounter the same numbers.
+set.seed(1234)
+
+# Generates 100 random variables, each with 5 observations, from a normal distribution between 0 and 1.
+randomdataframe<-replicate(100,runif(100,min=1,max=10))
+
+# Number of columns of the matrix.
+x<-as.integer(ncol(randomdataframe))
+
+# Data type of variable x.
+typeof(x)
+
+# Using for loop(2,100).
+for (i in 2:100) {
+  # Keeps the columns from 1 to i of matrix randomdataframe . 
+  rd<-randomdataframe[,1:i]
+  #Use 70% of dataset as training set and remaining 30% as testing set
+  sample <- sample(nrow(rd), 0.70*nrow(rd))
+  train <- as.data.frame(rd[sample, ])
+  test  <- as.data.frame(rd[-sample, ])
+  # Estimation of the multiple linear regression model using our train set. 
+  lm_train<-lm(V1~., data = train)
+  # Calculate Mean Squared Error (MSE) for our training set.
+  MSE_train_set <- mean((train[, 1] - lm_train$fitted.values)^2)
+  # Use the estimated model to predict (Y=V1) the dependent variable for the test set.
+  predicted_test<-predict( lm_train,test)
+  # Calculate Mean Squared Error (MSE) for our test set.
+  MSE_test_set<-mean((test[,1]-predicted_test)^2)
+  # Print only when MSE_test_set is greater than 100 times MSE_train_set
+  if (MSE_test_set > 100 * MSE_train_set) {
+  print(paste("MSE Training Set (", i-1, " variables): ", MSE_train_set, 
+              " | MSE Test Set (", i-1, " variables): ", MSE_test_set))
+  }
+}
+
+# A new dataframe that will contain 63 variables.
+new_randomdataframe<-as.data.frame(randomdataframe[,1:63])
+
+# Here we define the percentage of the data that will be used in the train set(0.7) and the percentage that will be used in the test set(0.3).
+indices<-sample(nrow(new_randomdataframe),0.70*nrow(new_randomdataframe))
+trainset<- as.data.frame(new_randomdataframe[indices,])
+testset<- as.data.frame(new_randomdataframe[-indices,])
+
+# Estimation of the multiple linear regression model.
+lm_trainset<-lm(V1~.,data =trainset )
+
+# The calculation of Mean Squared Error(MSE) for the training set.
+training_error<-mean((trainset[,1]-lm_trainset$fitted.values)^2)
+
+#Using our model, we will make predictions on the unknown data.
+Predicted_testset<-predict(lm_trainset,newdata=testset)
+
+# The calculation of Mean Squared Error(MSE) for the test set.
+generalization_error<-mean((testset[,1]-Predicted_testset)^2)
+
+# Print training_error, generalization_error.
+print(c("training_error"=training_error,"generalization_error"=generalization_error))
+
+#We observe a very small training error and a significantly large generalization error, indicating a situation known as overfitting.
+
+
+
+question 5.
+
+# Clear the R enviroment.
+rm(list=ls())
+
+# Set working directory.
+setwd("C:\\Users\\admin\\OneDrive\\Υπολογιστής\\big data(3 project)")
+
+# Import a csv file in R.
+forestfires<- read.csv("forestfires.csv", header = TRUE)
+
+# Return the first and last 6 rows of the dataframe.
+head(forestfires)
+tail(forestfires)
+
+
+# i).
+
+
+# This function calculates the Root Mean Squared Error (RMSE).
+calculateRMSE<-function(predictedValues, actualValues){
+  err<- sqrt( mean((actualValues - predictedValues)^2)  )
+  return( err )
+}
+
+# A function that uses k-Fold Cross validation method.
+kFoldCrossValidation<-function(data, frml, k){
+  
+  #It is a vector indicating in which "bin" each observation belongs, thus dividing the total observations into 10 subsets.
+  folds <- cut(seq(1,nrow(data)), breaks=k, labels=FALSE)
+  
+  #An empty vector named RMSE.
+  RMSE<-vector()
+  
+  #A loop from 1 to k.
+  for(i in 1:k){
+    
+    # It locates the positions of observations belonging to the specific fold and stores them in the variable testIndexes. 
+    testIndexes <- which(folds==i,arr.ind=TRUE)
+    
+    # Testing set.
+    testData <- data[testIndexes, ]
+    
+    # Training set.
+    trainData <- data[-testIndexes, ]
+    
+    #Estimation of a multiple linear model.
+    candidate.linear.model<-lm( frml, data = trainData)
+    
+    #Using the linear model, we will estimate unseen data.
+    predicted<-predict(candidate.linear.model, testData)
+    
+    # Calculate the Root Mean Squared Error (RMSE).
+    error<-calculateRMSE(predicted, testData[, "area"])
+    
+    # Assigned the values of the RMSE errors calculated in each iteration of the loop.
+    RMSE<-c(RMSE,error)
+  }
+  return( mean(RMSE) )
+}
+
+# Calculate mean.RMSE(estimate of the generalization error). 
+mean.RMSE<-kFoldCrossValidation(forestfires,area~ temp+wind+rain,10)
+
+# Display Mean-RMSE.
+print(c("Mean-RMSE"=mean.RMSE))
+
+
+# ii).
+
+
+# Keep the lines that have area<3.2 of the dataframe(forestfires).
+forestfires<- forestfires[forestfires$area<3.2,]
+
+# Calculate mean.RMSE(estimate of the generalization error). 
+mean.RMSE.small_fires<-kFoldCrossValidation(forestfires,area~ temp+wind+rain,10)
+
+# Display Mean-RMSE.
+print(c("Mean-RMSE.small_fires"=mean.RMSE.small_fires))
+
+
+
+question 7i.
+
+# Remove all objects from the workspace
+rm(list = ls())
+
+# Set the working directory
+setwd("C://Users//kwstasbenek//Desktop/giannakopoulo_8//Tsagkarakis_3h_ergasia")
+#libraries/packages
+install.packages(c("dplyr", "tidyr", "cluster", "ggplot2"))
+library(dplyr)
+library(tidyr)
+library(cluster)
+library(ggplot2)
+
+# Read movies and ratings data
+movies <- read.csv('C:\\Users\\kwstasbenek\\Desktop\\giannakopoulo_8\\Tsagkarakis_3h_ergasia\\3hErgasia\\movies.csv', header = TRUE)
+ratings <- read.csv('C:\\Users\\kwstasbenek\\Desktop\\giannakopoulo_8\\Tsagkarakis_3h_ergasia\\3hErgasia\\ratings.csv', header = TRUE)
+
+# Extract category variables (dummy variables) from the movies DataFrame
+categories_data <- movies[, 3:ncol(movies)]
+
+# Choose the number of clusters (K) using the Elbow method
+# Assume that k_values is a vector containing values from 2 to 100
+sum_of_squared_distances <- numeric(length = 0)
+k_values <- 2:100
+
+for (k in k_values) {
+  # Initialize k-modes cluster model
+  #iteration=5 for the same reason as metioned in the python script
+  kmeans_result <- KMeans(categories_data, centers = k, algorithm = "Hartigan-Wong", iter.max = 5, nstart = 5)
+  
+  # After fitting and predicting, store the cost of clustering (sum of squared distances)
+  #The withinss attribute represents the sum of squared distances from each point in a cluster to the center of that cluster. 
+  #Essentially, it is a measure of how tight or compact the clusters are.
+  #Then, we append the total sum of squared distances for the current value of k (number of clusters) to the vector
+  sum_of_squared_distances <- c(sum_of_squared_distances, sum(kmeans_result$withinss))
+}
+
+# Plot the Elbow graph
+plot(k_values, sum_of_squared_distances, type = 'b', xlab = 'Number of Clusters (K)', ylab = 'Sum of Squared Distances', main = 'Elbow Method For Optimal K')
+
+# Choose the optimal number of clusters (K) based on the Elbow method
+# Find the index where the first derivative of the sum of squared distances is minimized
+#The diff(sum_of_squared_distances) calculates the differences between consecutive elements in the vector sum_of_squared_distances. 
+#The which.min() function is then applied to find the index where these differences are minimized.
+optimal_k <- which.min(diff(sum_of_squared_distances)) + 1 #assuming k starts from 2
+
+
+cat("Optimal number of clusters (K):", optimal_k, "\n")
+
+# Re-run the k-clustering model with the optimal number of clusters
+kmeans_result <- kmeans(categories_data, centers = optimal_k, algorithm = "Hartigan-Wong", iter.max = 5, nstart = 5)
+cluster_labels <- kmeans_result$cluster
+
+# Add the 'clusterId' column to the movies data frame
+movies$clusterId <- cluster_labels
+
+# Calculate the average rating for each movie
+#FUN = mean: Specifies the function to be applied to each subset of data. 
+#Here, we are using the mean function to calculate the average rating for each movie.
+average_ratings <- aggregate(rating ~ movieId, data = ratings, FUN = mean)
+
+# Merge the two data frames based on the unique "movieId"
+#all.x specifies that all the rows from the left data frame (movies in this case) should be included in the merged data frame.
+movies <- merge(movies, average_ratings, by = 'movieId', all.x = TRUE)
+
+# Specify the user for whom movie recommendations are being generated
+user_id <- 198
+
+# Extract ratings from the ratings data frame for the specific user
+user_ratings <- subset(ratings, userId == user_id)
+
+# Merge user_ratings_df and movies_df on movieId and clusterId
+#cbind
+user_ratings <- merge(user_ratings, movies[, c('movieId', 'clusterId')], by = 'movieId', all.x = TRUE)
+
+# Group user ratings by clusterId and calculate the mean rating for each cluster
+#aggregate function is used to to group the 'user_ratings' data frame by the 'clusterId' column and calculate the mean rating for each cluster.
+cluster_avg_ratings <- aggregate(rating ~ clusterId, data = user_ratings, FUN = mean)
+
+# Display the average ratings for each cluster
+cat("\nAverage Ratings for Each Cluster:\n")
+print(cluster_avg_ratings)
+
+# Filter clusters with average rating >= 3.5
+#and keep their clusterId
+high_rated_clusters <- subset(cluster_avg_ratings, rating >= 3.5)$clusterId
+
+# Check if there are clusters with average rating >= 3.5
+#check if not empty
+if (length(high_rated_clusters) > 0) {
+  # For each high-rated cluster, find top 2 movies user hasn't seen
+  recommendations <- data.frame()
+  
+  for (cluster_id in high_rated_clusters) {
+    # Keep only movies that belong to the current cluster and subset them
+    
+    cluster_movies <- subset(movies, clusterId == cluster_id)
+    
+    # Keep only the unrated movies using '~'
+    #!(movieId %in% user_ratings$movieId): This part is a logical condition. 
+    #It checks for each movie in cluster_movies whether its movieId is NOT in the vector of movie IDs that the user has rated (user_ratings$movieId).
+    #Then we subset based on this logical condition
+    unrated_movies <- subset(cluster_movies, !(movieId %in% user_ratings$movieId))
+    
+    # Check if there are unrated movies in the cluster
+    if (nrow(unrated_movies) > 0) {
+      # If unrated movies in the cluster, select the top 2 (with the highest rating)
+      #we order the unrated _movies df in a decreasing order and only keep the first 2 movies
+      top_movies <- unrated_movies[order(unrated_movies$rating, decreasing = TRUE), ][1:2, ]
+      
+      # Put them in the recommendations data frame
+      recommendations <- rbind(recommendations, top_movies)
+    }
+  }
+  
+  # Check if there are recommendations
+  if (nrow(recommendations) > 0) {
+    # Display recommendations
+    cat("\nMovie Recommendations:\n")
+    print(recommendations)
+  } else {
+    cat("\nSorry, no new movies to recommend from high-rated clusters!\n")
+  }
+  
+} else {
+  cat("\nSorry, no high-rated clusters found for recommendations!\n")
+}
+
+
+
+question 7ii.
+
+
+
+# Remove all objects from the workspace
+rm(list = ls())
+
+# Close all open graphical devices
+graphics.off()
+
+# Read the CSV file
+europe_data <- read.csv("C:\\Users\\kwstasbenek\\Desktop\\giannakopoulo_8\\Tsagkarakis_3h_ergasia\\3hErgasia\\europe.csv", header = TRUE)
+
+# Remove leading whitespaces from column names
+names(europe_data) <- trimws(names(europe_data))
+#save country names 
+country_names <- europe_data$Country
+# Set 'Country' column as the row names
+rownames(europe_data) <- europe_data$Country
+europe_data$Country <- NULL  # Remove 'Country' column
+
+# Convert data to numeric, non-numeric items will be converted to NA
+europe_data <- apply(europe_data, 2, as.numeric)
+
+# Remove rows with NA values
+europe_data <- na.omit(europe_data)
+
+# Normalize features
+scaled_data <- scale(europe_data)
+
+# Perform hierarchical clustering using hclust
+#distance matrix using dist(), specifying euclidean 
+distance_matrix <- dist(scaled_data, method = "euclidean")
+#"ward.D2" refers to the variant of the Ward's method used, which is a criterion for measuring the dissimilarity between two clusters.
+#The "D2" in "ward.D2" stands for squared Euclidean distance.
+hierarchical_cluster <- hclust(distance_matrix, method = "ward.D2")
+
+# Plot the dendrogram with 'Country' values as labels
+plot(hierarchical_cluster, hang = -1, cex = 0.8, main = "Hierarchical Clustering Dendrogram",
+     xlab = "Country", ylab = "Distance", labels = country_names)
+
+
+
+question 8.
+
+  # Remove all objects from the workspace
+  rm(list = ls())
+  
+  # Close all open graphical devices
+  graphics.off()
+  install.packages("arules")
+  library(arules)
+  # Specify the path to your text file
+  file_path <- "C:\\Users\\kwstasbenek\\Desktop\\giannakopoulo_8\\Tsagkarakis_3h_ergasia\\fertility\\fertility_Diagnosis.txt"
+  
+  # Read the text file into a data frame
+  data <- read.table(file_path, header = TRUE, sep = ",")
+  
+  # Display the first few rows of the data frame
+  head(data)
+  # Assuming your_data is already defined
+  colnames(data) <- c(
+    "Season",
+    "Age",
+    "Childish_diseases",
+    "Accident_or_serious_trauma",
+    "Surgical_intervention",
+    "High_fevers_last_year",
+    "Alcohol_consumption_frequency",
+    "Smoking_habit",
+    "Hours_sitting_per_day",
+    "Diagnosis"
+  )
+  
+  
+  # Add descriptions to the variables
+  attr(data$Season, "description") <- "1) winter, 2) spring, 3) Summer, 4) fall.  (-1, -0.33, 0.33, 1)"
+  attr(data$Age, "description") <- "18-36  (0, 1)"
+  attr(data$Childish_diseases, "description") <- "1) yes, 2) no.  (0, 1)"
+  attr(data$Accident_or_serious_trauma, "description") <- "1) yes, 2) no.  (0, 1)"
+  attr(data$Surgical_intervention, "description") <- "1) yes, 2) no.  (0, 1)"
+  attr(data$High_fevers_last_year, "description") <- "1) less than three months ago, 2) more than three months ago, 3) no.  (-1, 0, 1)"
+  attr(data$Alcohol_consumption_frequency, "description") <- "1) several times a day, 2) every day, 3) several times a week, 4) once a week, 5) hardly ever or never  (0, 1)"
+  attr(data$Smoking_habit, "description") <- "1) never, 2) occasional 3) daily.  (-1, 0, 1)"
+  attr(data$Hours_sitting_per_day, "description") <- "ene-16  (0, 1)"
+  attr(data$Diagnosis, "description") <- "normal (N), altered (O)"
+  
+  # Display the updated data frame
+  data
+  # remove columns "Age at the time of analysis" and "Hours_sitting_per_day "
+  modified_fertility_data <- subset(data, select = -c(Age, `Hours_sitting_per_day`))
+  #set data to categorical variables 
+  
+  modified_fertility_data$Season <- factor(modified_fertility_data$Season, levels = c(-1, -0.33, 0.33,1))
+  modified_fertility_data$Childish_diseases<- factor(modified_fertility_data$Childish_diseases, levels = c(0,1))
+  modified_fertility_data$Accident_or_serious_trauma<- factor(modified_fertility_data$Accident_or_serious_trauma, levels = c(0,1))
+  modified_fertility_data$Surgical_intervention<- factor(modified_fertility_data$Surgical_intervention, levels = c(0,1))
+  modified_fertility_data$High_fevers_last_year<- factor(modified_fertility_data$High_fevers_last_year, levels = c(-1,0,1))
+  modified_fertility_data$Alcohol_consumption_frequency<- factor(modified_fertility_data$Alcohol_consumption_frequency, levels = c(0, 0.2, 0.4, 0.6,0.8,1.0))
+  modified_fertility_data$Smoking_habit<- factor(modified_fertility_data$Smoking_habit, levels = c(-1,0,1))
+  modified_fertility_data$Diagnosis<- factor(modified_fertility_data$Diagnosis, levels = c("N","O"))
+  
+  
+  
+  # turn data into transaction format
+  #transaction format is a data format :each row represent a transaction, each column represent an item and it takes a binary form (1,0) accounting for the presence or abcense of an obeject in the specific tranaction 
+  # Apriori is designed to work on transaction format data since it figures out rules for items that frequently co-ccour in transactions 
+  #to identify frequently re-occuring item sets, the algorithm calculates support for each possible itemset
+  #support in this context being the proportion of transactions, in refference to the total n of transactions that contain the specific itemset
+  transactions <- as(modified_fertility_data, "transactions")
+  
+  # perform apriori
+  #apriori algorithm is used to discover these association rules by identifying frequent itemsets
+  rules <- apriori(transactions)
+  
+  # print n of rules 
+  #rules in this context refers to a statement that describes potential assosiations between item sets in the daata set, based on pattern recognision 
+  cat("Πλήθος Κανόνων:", length(rules), "\n")
+  
+  # check out rules 
+  inspect(rules)
+  # support = 0.02,  means that only itemsets that appear in at least 2% of transactions will be considered frequent
+  #Confidence measures the probability of the occurrence of the consequent given the presence of the antecedent in a rule
+  #confidence=1 means that nly rules with 100% confidence will be considered. This implies that the presence of the antecedent guarantees the presence of the consequent.
+  rules <- apriori(transactions, parameter = list(support = 0.02, confidence = 1))
+  
+  # "Diagnosis=O" is the condition that the right-hand side of the rule should match.
+  # rhs stands for right-hand side.
+  # grepl is a function in R that searches for a pattern in a character vector and 
+  # returns a logical vector indicating whether a match was found in each element of the vector.
+  # So, in this line of code, we check the labels of all right-hand side rules produced for Diagnosis="O" and
+  # then create a subset containing all the rules with Diagnosis=O.
+  # The resulting 'altered_rules' data frame contains rules where the right-hand side matches the pattern "Diagnosis=O".
+  
+  altered_rules <- subset(rules, subset = grepl("Diagnosis=O", labels(rhs(rules))))
+  
+  # print/inspect new rules 
+  cat("Πλήθος Κανόνων με Diagnosis=altered:", length(altered_rules), "\n")
+  inspect(altered_rules)
+  
+#sort rules by lift
+#decreasing=TRUE indicated that the rules will be sorted in a decreasing order 
+#lift measured the "strength" of a rule, it is calculated as the ratio of the support of the combined itemset 
+#to the product of the individual supports of the antecedent and consequent.
+rules_sorted <- sort(altered_rules, by = "lift", decreasing = TRUE)
+
+# define a function to give us if a rule is a super rule 
+#comp_rule@lhs %in% rule@lhs checks if each item in the LHS of comp_rule is present in the LHS of rule.
+#all(...) ensures that all elements in comp_rule@lhs are present in rule@lhs
+#The result, is_subset_lhs, is a logical value indicating whether the LHS of comp_rule is a subset of the LHS of rule
+#I use as.character to convert the LHS vectors to character before checking for subset using %in% 
+#identical is a function that checks if 2 objects are identical, we apply this to check if the rhs is the same (it is we already know that just to be sure though)
+#overall in this function for a comp_rule to be a super rule it need to have identical rhs(with the rule we check) && lhs of theb rule we check must be a subset of comp_rule&& comp_rule needs to ave greater or equal lift value
+#is_super_rule_rhs is logical function
+is_super_rule_lhs <- function(rule, comp_rule) {
+  is_subset_lhs <- all(as.character(comp_rule@lhs) %in% as.character(rule@lhs))
+  identical(rule@rhs, comp_rule@rhs) && is_subset_lhs && comp_rule@quality["lift"] >= rule@quality["lift"]
+}
+
+#empty list to put the super rules in 
+pruned_rules <- list()
+
+#This code applies the lapply function to the list rules_sorted@quality
+#I use @quality becasue i couldnt find any other way to itterate through the "rules_sorted" S4 object, and overall that the reason for this whole over-complication
+#For each element (current_rule) in the list, it executes the code inside the anonymous function
+#current_rule represents an element of the rules_sorted@quality list
+#The sapply function is used to apply the is_super_rule_lhs function to each element in pruned_rules to check if current_rule is a super rule compared to any rule in pruned_rules
+# If there is no super rule for the current_rule  it is included in the final result (return(current_rule))
+#if there is a super rule  it is excluded from the final result (return(NULL))
+pruned_rules <- lapply(rules_sorted@quality, function(current_rule) {
+  # Check if the current rule is not a super rule based on LHS
+  if (!any(sapply(pruned_rules, function(comp_rule) is_super_rule_lhs(current_rule, comp_rule)))) {
+    return(current_rule)
+  }
+  return(NULL)
+})
+
+# Filter out NULL values(not super rules)
+pruned_rules <- Filter(Negate(is.null), pruned_rules)
+
+# Display pruned rules
+cat("Πλήθος Κανόνων μετά την αφαίρεση περιττών κανόνων:", length(pruned_rules), "\n")
+View(pruned_rules)
+

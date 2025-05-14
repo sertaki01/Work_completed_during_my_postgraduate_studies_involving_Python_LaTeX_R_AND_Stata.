@@ -1,0 +1,247 @@
+# subject 3 (I)
+
+# Includes functions for Naive Bayes.
+library(e1071)
+
+# The folder that stores and retrieves files is defined.
+setwd("C:\\Users\\admin\\OneDrive\\Υπολογιστής\\big data(2 project)")
+
+# Deletes all variables located in the working environment.
+rm(list = ls())
+
+# Deletes all the plots that have been created.
+graphics.off()
+
+# Read the data from the file.
+data<-read.csv("IMDBDataset.csv",header=TRUE)
+
+# Take a quick look at the data.
+head(data)
+
+tail(data)
+
+# we install package "stringr" for removing all characters that are not letters or numbers.
+library(stringr)
+
+# Use str_replace_all to remove special characters.
+clean <- function(text) {
+  cleaned <- str_replace_all(text, "[^[:alnum:] ]", "")
+  return(cleaned)
+}
+
+# Apply the clean function to review column of the data frame, we also use sapply that applies a given function to each element of a list.
+data$review <- sapply(data$review, clean)
+
+# The to_lower function is used to transform text into lowercase(small).
+to_lower<-function(text){
+  return(tolower(text))
+}
+
+# load the dplyr package so you can apply the to_lower function.
+library(dplyr)
+
+# Apply the to_lower function at review column in the dataframe, we also use sapply that applies a given function to each element of a list .
+data$review <- sapply(data$review, to_lower)
+
+# We install package "tm",essential functions for text processing. 
+install.packages("tm")
+library(tm)
+
+# Function to remove stopwords(i,me,my...).
+rem_stopwords <- function(text) {
+  words <- stopwords(kind ="english")
+  return(removeWords(text, words))
+}
+
+# Apply the function stopwords in column review.
+data$review <- sapply(data$review, rem_stopwords)
+
+# We install package "SnowballC",essential function for stemming.
+install.packages("SnowballC")
+library(SnowballC)
+
+# Function for stemming(To reduce words to a common form or root, we use stemming).
+stem_text <- function(text) {
+  return(wordStem(text, language = "en"))
+}
+
+# Apply the function stemming to column review.
+data$review <- sapply(data$review, stem_text)
+
+# For checking the preprocessing. 
+head(data)
+
+# Creating Term-Document Matrices.
+dtm <- DocumentTermMatrix(data$review)
+
+# Inspecting a term-document matrix.
+inspect(dtm)
+
+# Find those terms that occur at least five times.
+findFreqTerms(dtm, 5)
+
+# This function call removes those terms which have at least a 99.745% of sparse (terms occurring 0 times in a document).
+dtm<-removeSparseTerms(dtm,0.99745)
+
+# The conversion to a matrix using as.matrix() makes the matrix dense, meaning that all its values are stored in memory without sparse representations.
+dtm_matrix<-as.matrix(dtm)
+
+# Create a data frame with dtm_matrix and sentiment
+data_for_model <- cbind(as.data.frame(dtm_matrix), sentiment = data$sentiment)
+
+# Split into training and testing sets
+train_size <- 0.8 # This line sets the proportion of the data that you want to use for training.
+train_index <- sample(1:nrow(data_for_model), round(train_size * nrow(data_for_model))) # This line generates random indices for the training set.
+train_data <- data_for_model[train_index, ] # This line creates the training set. 
+test_data <- data_for_model[-train_index, ] # This line creates the test set.
+
+# Train the Naive Bayes model.
+model <- naiveBayes(sentiment ~ ., data = train_data)
+
+# Make predictions on the test data.
+predictions <- predict(model, test_data)
+
+# Evaluate the model, computes the accuracy by dividing the total number of correct predictions by the total number of instances.
+conf_matrix <- table(predictions, test_data$sentiment)
+accuracy <- sum(diag(conf_matrix)) / sum(conf_matrix)
+
+# Print the accuracy.
+cat("Accuracy:", accuracy)
+
+
+
+# Subject 4 (1) 
+
+# Deletes all variables located in the working environment.
+rm(list = ls())
+
+# Deletes all the plots that have been created.
+graphics.off()
+
+# Set working directory.
+setwd("C:\\Users\\admin\\OneDrive\\Υπολογιστής\\big data(2 project)")
+
+# Read the Mushroom dataset.
+mushroom_data<-read.table("agaricus-lepiota.data",header = FALSE,sep = ",")
+
+# Adjust the column names.
+colnames(mushroom_data)<-c("poisonous","cap-shape","cap-surface","cap-color","bruises","odor","gill-attachment","gill-spacing","gill-size","gill-color","stalk-shape","stalk-root","stalk-surface-above-ring","stalk-surface-below-ring","stalk-color-above-ring","stalk-color-below-ring","veil-type","veil-color","ring-number","ring-type","spore-print-color","population","habitat")
+
+# Shows first few rows.
+head(mushroom_data)
+
+# Shows the last few rows.
+tail(mushroom_data)
+
+# Structure.
+str(mushroom_data)
+
+# Download package.
+install.packages("rpart")
+library(rpart)
+install.packages("rpart.plot")
+library(rpart.plot)
+
+# Calculate the total number of question marks and NA values for the specific column.
+missing_values <- sum(is.character(mushroom_data$"stalk-root") & (mushroom_data$"stalk-root" == "?" | is.na(mushroom_data$"stalk-root")))
+
+# Print the result.
+print(missing_values)
+
+# Remove rows with missing values(?) in the "stalk-root" column. 
+mushroom_data <- subset(mushroom_data, mushroom_data$"stalk-root" != "?")
+
+# Shows first few rows.
+head(mushroom_data)
+
+# Shows the last few rows.
+tail(mushroom_data)
+
+# Create training and testing sets for our model.
+set.seed(8)  
+train = sample( 1:nrow(mushroom_data), nrow(mushroom_data)*0.8)
+test = -train
+training_data =mushroom_data[train,]
+test_data=mushroom_data[-train,]
+
+# Create the decision tree using the training data. We want to predict poisonous based on all other attributes of the mushroom_data dataset.
+tree_model = rpart(poisonous  ~ . , data=training_data, method="class",cp=0.001 )
+
+# Visualize the dicision tree
+rpart.plot(tree_model, main="Decision Tree",fallen.leaves = TRUE, branch = 1)
+
+# Predict the class attribute (poisonous) for the testing dataset. Apply testing dataset.
+tree_predict = predict(tree_model, test_data, type="class")
+
+# Create Confusion Matrix.
+testingDataConfusionTable = table(tree_predict, test_data$poisonous)
+
+# The table distinguishes the following four elements: True e(up left),True p (down right),False e (down left),False p (up right). 
+print(testingDataConfusionTable)
+
+# We see how many variables are correctly categorized based on certain characteristics.
+modelAccuracy = sum( diag(testingDataConfusionTable)/sum(testingDataConfusionTable))
+
+# Print Accuracy of our model, This means the percentage of instances that a feature correctly classified into the correct category based on certain characteristics.
+cat("Accuracy:",modelAccuracy)
+
+
+
+
+# Subject 4 (2) 
+
+# Frequency table of poisonous.
+frequency_table1 <- table(mushroom_data$poisonous[1:30])
+
+# Print frequency table of poisonous.
+print(frequency_table1)
+
+# We created a subset with rows from 1 to 30 and columns(1,23).
+subset <- mushroom_data[1:30,c(1,23)]
+
+# Frequency table of subset.
+frequency_table2 <- table(subset)
+
+# Print frequency table of subset.
+print(frequency_table2)
+
+# Calculate the entropy before the split.
+Entropy_poisonous<- function(a,b){
+  total<- a+b
+  p_a<- a/total
+  p_b<- b/total
+  if (p_a == 0) {
+    log_p_a <- 0
+  } else {
+    log_p_a <- log2(p_a)
+  }
+  if (p_b == 0) {
+    log_p_b <- 0
+  } else {
+    log_p_b <- log2(p_b)
+  }
+  entropy_before_split<- -p_a * log_p_a - p_b * log_p_b
+  return(entropy_before_split)
+}
+
+# Entropy before split with habit. 
+entropy.before.split <- Entropy_poisonous(21, 9)
+print(entropy.before.split)
+
+# Entropy_split(habitat).
+Entropy_habitat<-function(a,b,c,d){
+  total<-a+b+c+d
+  na_n<-a/total
+  nb_n<-b/total
+  nc_n<-c/total
+  nd_n<-d/total
+  Entropy_split<-na_n*Entropy_poisonous(1,0)+nb_n*Entropy_poisonous(7,4)+nc_n*Entropy_poisonous(11,0)+nd_n*Entropy_poisonous(2,5)
+  return(Entropy_split)
+}
+
+# Entropy split(habitat).
+Entropy.split<-Entropy_habitat(1,11,11,7)
+
+# Entropy Gain from Splitting Based on Habitat.
+Entropy.Gain<-entropy.before.split-Entropy.split
+print(Entropy.Gain)

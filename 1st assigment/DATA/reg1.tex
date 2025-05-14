@@ -1,0 +1,33 @@
+\documentclass[]{article}
+\setlength{\pdfpagewidth}{8.5in} \setlength{\pdfpageheight}{11in}
+\begin{document}
+\begin{tabular}{lccc}
+\multicolumn{4}{c}{ARIMA Regression} \\ \hline
+ & (1) & (2) & (3) \\
+VARIABLES & ADJ & LR & SR \\ \hline
+ &  &  &  \\
+D.SP500\_ln &  &  & 0.376*** \\
+ &  &  & (0.064) \\
+D.Gold\_ln &  &  & 0.078 \\
+ &  &  & (0.259) \\
+LD.Gold\_ln &  &  & 0.691*** \\
+ &  &  & (0.226) \\
+D.Silver\_ln &  &  & -0.031 \\
+ &  &  & (0.104) \\
+L.SP500\_ln &  & 0.441*** &  \\
+ &  & (0.082) &  \\
+L.Gold\_ln &  & 0.255 &  \\
+ &  & (0.187) &  \\
+L.Silver\_ln &  & -0.037 &  \\
+ &  & (0.121) &  \\
+L.WTI\_ln & -0.854*** &  &  \\
+ & (0.091) &  &  \\
+Constant &  &  & 1.891*** \\
+ &  &  & (0.546) \\
+ &  &  &  \\
+Observations & 118 & 118 & 118 \\
+ R-squared & 0.538 & 0.538 & 0.538 \\ \hline
+\multicolumn{4}{c}{ Standard errors in parentheses} \\
+\multicolumn{4}{c}{ *** p$<$0.01, ** p$<$0.05, * p$<$0.1} \\
+\end{tabular}
+\end{document}
